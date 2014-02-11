@@ -1,0 +1,580 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Identifikace: HTML5 preview</title>
+    <!-- dygraphs, interactive graphs http://dygraphs.com/ --->
+    <script type="text/javascript" src="../Scripts/dygraph-combined.js"></script>
+    
+    <!-- excel like tables, http://handsontable.com/ -->
+    <script src="../Scripts/jquery-1.9.1.min.js"></script>
+    <script src="../Scripts/jquery.handsontable.full.js"></script>
+
+    
+    <link rel="stylesheet" media="screen" href="../Scripts/jquery.handsontable.full.css"/>
+    <link rel="stylesheet" media="screen" href="../Scripts/javascript-tabs.css"/>
+    
+    <!-- http push technology to notify clients - signalr  http://signalr.net/ -->
+    <script src="../Scripts/jquery.signalR-1.1.0.min.js" type="text/javascript"></script>
+<!--  If this is an MVC project then use the following -->
+<!--  <script src="~/signalr/hubs" type="text/javascript"></script> -->
+    <script src="../signalr/hubs" type="text/javascript"></script>
+    <!-- authentication -->
+    <script src="../Scripts/mygoogleauth.js"></script>
+    <style>
+        #graph1 { width:600px; height: 400px; float:left; }
+        #graph1 .dygraph-title { font-size: 30px; text-shadow: 2px 2px 2px gray; }
+        #dataTable { width:400px; height:400px;  float:left; }
+        #parameterTable { width:400px; height:200px;  float:left; }
+        #identTable { width:400px; height:200px;  float:left; }
+        #computationParamsTable { width:400px; height:80px;  float:left; }
+        #identGraph { width:600px; height: 400px; float:right; }
+        #identGraph .dygraph-title { font-size: 26px; text-shadow: 2px 2px 2px gray; }
+        #identTimeGraph { width:600px; height: 200px; float:right; }
+        #currentRow {background-color: lightblue}
+        #currentCol {background-color: lightblue}
+        #loginText {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
+        #uName {float: right;font-size: 80%;padding-top: 2px;}
+        #buttons { float: left;}
+        #messages { font-size: 80%;}
+        #messagewrapper {float: left;}
+        #graphsettingswrapper { float: right;}
+        
+        select  {  overflow: hidden;background-color: #ffdfdf;color:black;  border:1px solid #000;  padding:5px 3px 5px 10px; }
+    </style>
+</head>
+    <body>
+              <div id="wrapper">                  
+                 <a href='#' onClick="login();" id="loginText"> Login via Google Account </a><a href="#" style="display:none" id="loginText" target='myIFrame' onclick="myIFrame.location='https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a><iframe name='myIFrame' id="Iframe1" style='display:none'></iframe>
+                 <b id='uName'> Not logged in.&nbsp;</b> 
+              <div id="tabContainer">
+                  <div id="tabs">
+                      <ul>
+                          <li id="tabHeader_1">Model selection</li>
+                          <li id="tabHeader_2">Sample data</li>
+                          <li id="tabHeader_3">Parameters</li>
+                          <li id="tabHeader_4">Identification</li>
+                          <li id="tabHeader_5">Results</li>
+                      </ul>
+                  </div>
+            
+                  <div id="tabscontent">
+                      <div id="tabpage_1" class="tabpage">
+                          <h2 class="tabset_label">Model selection</h2>
+                          <p>This application may be used to compute unknown parameters of model based on experimental sample data. The parameters are computed/estimated so the 
+                          model with this parameters will be as much close to the sample experimental data.
+                          </p>
+                          <p >Choose model, (number in parenthesis is number of available computational nodes):</p>
+                          <select size="10" name="selectionField" id="models" onchange="getSelectedModel(this)"> 
+                              <option value="mysinc" >test model</option>  
+                          </select>
+                      </div>
+                      <script>
+                          var selectedModel = '';
+                          function getSelectedModel(sel) {
+                              console.log("getselectedmodel");
+                              console.log(sel);
+                              selectedModel = sel.options[sel.selectedIndex].value;
+                              console.log(selectedModel);
+                          }
+
+                      </script>
+                      <div id="tabpage_2" class="tabpage">
+        
+                          <h2 class="tabset_label">Sample data</h2>
+                          <p>Write names of values into the first row, write values to the other rows. First column should contain time variable (usually Time in models) shown on X axis of the graph.
+                              To copy&amp;paste (CTRL-C CTRL-V) ensure that the values are "TAB" separated, unfortunately comma separated are not yet implemented.</p>
+            
+                          <div id="dataTable"></div>
+                          <div id="graph1"></div>
+
+                          <script>
+                              function myparseFloat(x) {
+                                  //console.log("x", x);
+                                  myx2 = x.slice(0,x.length-1);            
+                                  myx = myx2.map(parseFloat); //remove last element and convert other elements to float.
+                                  //console.log("myx", myx);
+                                  return myx;
+                              }        
+
+                //data from mySinc demo
+                              var data = [["X", "Y"],[-5.8, -1.42151], [-5.7, -1.122283], [-5.6, -1.726408], [-5.5, -0.799811], [-5.4, -0.744058], [-5.3, -0.582256], [-5.2, -1.079], [-5.1, -1.359054], [-5, -0.767021], [-4.9, -1.307606], [-4.8, -0.775595], [-4.7, -1.068592], [-4.6, -1.077045], [-4.5, -1.20232], [-4.4, -0.770057], [-4.3, -0.770878], [-4.2, -0.799857], [-4.1, -0.761019], [-4, -0.782072], [-3.9, -0.693731], [-3.8, -1.174525], [-3.7, -0.841475], [-3.6, -0.733265], [-3.5, -0.493757], [-3.4, -0.641393], [-3.3, -0.844612], [-3.2, -0.283064], [-3.1, -0.597967], [-3, -0.507505], [-2.9, -0.923121], [-2.8, -0.835391], [-2.7, -0.682781], [-2.6, -0.414918], [-2.5, -0.58399], [-2.4, -0.334482], [-2.3, -0.267546], [-2.2, -0.324681], [-2.1, -0.285442], [-2, -0.400725], [-1.9, -0.370074], [-1.8, -0.480039], [-1.7, -0.657046], [-1.6, -0.602963], [-1.5, -0.246462], [-1.4, -0.061178], [-1.3, 0.09545], [-1.2, 0.116567], [-1.1, 0.037929], [-1, -0.25163], [-0.9, -0.46075], [-0.8, -0.806609], [-0.7, -0.934133], [-0.6, -0.629596], [-0.5, -0.086991], [-0.4, 0.477007], [-0.3, 1.182501], [-0.2, 3.146113], [-0.1, 2.641952], [0, 2.343302], [0.1, 3.239905], [0.2, 2.383603], [0.3, 1.067605], [0.4, 0.924554], [0.5, 0.095162], [0.6, -0.395317], [0.7, -0.569247], [0.8, -0.471617], [0.9, -0.11679], [1, 0.179433], [1.1, 0.331481], [1.2, 0.452191], [1.3, 0.465151], [1.4, 0.61706], [1.5, 0.389433], [1.6, 0.150308], [1.7, 0.041964], [1.8, 0.088226], [1.9, 0.261781], [2, 0.284331], [2.1, 0.385904], [2.2, 0.706046], [2.3, 0.732195], [2.4, 0.516506], [2.5, 0.521825], [2.6, 0.271135], [2.7, 0.3187], [2.8, 0.358039], [2.9, 0.484341], [3, 0.541993], [3.1, 0.674587], [3.2, 0.948519], [3.3, 0.924399], [3.4, 0.610796], [3.5, 0.860392], [3.6, 0.791332], [3.7, 0.519412], [3.8, 0.554208], [3.9, 0.310676], [4, 0.95334], [4.1, 0.771607], [4.2, 1.140395], [4.3, 1.406503], [4.4, 1.122487], [4.5, 1.28597], [4.6, 0.858668], [4.7, 0.860815], [4.8, 0.594436], [4.9, 0.81658], [5, 1.101501], [5.1, 0.961305], [5.2, 1.354965], [5.3, 1.161282], [5.4, 1.065607], [5.5, 1.412722], [5.6, 1.6186], [5.7, 1.190403], [5.8, 1.076949], [5.9, 0.832714], [6, 1.216899], [6.1, 1.144997], [6.2, 1.116105]];
+                //data for hummod
+                              //var data = [["Time", "gases.acidBase.ArtysPh.pH"],[0, 7.40004], [333.51, 7.38634], [992.64, 7.38534], [1369.38, 7.38565], [1808.73, 7.38593], [2219.31, 7.38604], [2551.56, 7.38604], [2875.55, 7.38597], [3186.94, 7.38587], [3492.72, 7.38576], [3797.46, 7.38564], [4090.08, 7.38554], [4375.36, 7.38545], [4676.13, 7.38537], [26372, 7.38825], [58516.2, 7.39239], [73114.2, 7.3927], [73272, 7.39271], [73434.1, 7.39271], [73588, 7.39271], [73734.7, 7.39272], [73881.5, 7.39272], [74028.6, 7.39272], [74162.1, 7.39272], [74302, 7.39273]];
+                              //var data = [["Time", "gases.acidBase.ArtysPh.pH"], [924.577, 7.37513], [1131.23, 7.37531], [1154.24, 7.37533], [1296, 7.37545], [1489.08, 7.37558], [1493.58, 7.37558], [1520.47, 7.3756], [1627.64, 7.37567], [1627.64, 7.37567], [1633.91, 7.37567], [1866.41, 7.37579], [1979.82, 7.37583], [2432.48, 7.37588], [2441.2, 7.37588], [2592, 7.37587], [3888, 7.37551], [3914.9, 7.3755], [3915.39, 7.3755], [3922.33, 7.3755], [3923.9, 7.3755], [3924.5, 7.3755], [3929.14, 7.3755], [3931.45, 7.3755], [4208.26, 7.37541], [4276.67, 7.37539], [5184, 7.37516], [5416.27, 7.37513], [6480, 7.375], [7761.95, 7.375], [7776, 7.375], [8965.36, 7.37505], [8966.42, 7.37506], [8966.42, 7.37506], [9072, 7.37506], [9935.54, 7.37514], [9935.54, 7.37514], [10368, 7.37518], [10704.9, 7.37522], [10704.9, 7.37522], [11419.8, 7.37532], [11419.8, 7.37532], [11424.7, 7.37532], [11424.7, 7.37532], [11664, 7.37535], [11952.9, 7.37539], [11952.9, 7.37539], [12481.1, 7.37547], [12481.1, 7.37547], [12558.2, 7.37548], [12558.2, 7.37548], [12960, 7.37555], [13100.9, 7.37557], [13100.9, 7.37557], [14256, 7.37577], [15552, 7.37601], [16147.8, 7.37613], [16147.8, 7.37613], [16176.6, 7.37614], [16176.6, 7.37614], [16848, 7.37627], [18144, 7.37653], [18327.6, 7.37657], [18327.6, 7.37657], [18335, 7.37657], [18335, 7.37657], [18335, 7.37657], [18335, 7.37657], [19440, 7.3768], [20736, 7.37708], [21072.6, 7.37715], [21072.6, 7.37715], [21119.8, 7.37716], [21119.8, 7.37716], [22032, 7.37735], [23054.5, 7.37756], [23054.5, 7.37756], [23328, 7.37762], [24624, 7.37789], [25920, 7.37816], [26786.7, 7.37833], [26786.7, 7.37833], [27216, 7.37842], [27615.7, 7.3785], [27615.7, 7.3785], [27708.3, 7.37852], [27708.3, 7.37852], [28512, 7.37868], [29808, 7.37893], [30068.3, 7.37898], [30068.3, 7.37898], [31104, 7.37918], [31122.6, 7.37919], [31122.6, 7.37919], [32400, 7.37942], [33696, 7.37966], [34992, 7.37987], [36288, 7.38009], [36843.8, 7.38017], [36843.8, 7.38017], [37584, 7.38029], [38421.2, 7.38043], [38421.2, 7.38043], [38880, 7.3805], [40176, 7.38069], [41472, 7.38087], [42400.6, 7.38099], [42400.6, 7.38099], [42768, 7.38104], [44064, 7.38121], [44929.6, 7.38131], [44929.6, 7.38131], [45360, 7.38136], [46080.7, 7.38145], [46080.7, 7.38145], [46656, 7.38151], [47812.6, 7.38164], [47812.6, 7.38164], [47952, 7.38166], [49248, 7.38179], [50544, 7.38192], [51564.5, 7.38202], [51564.5, 7.38202], [51564.5, 7.38202], [51564.5, 7.38202], [51632.5, 7.38202], [51632.5, 7.38202], [51840, 7.38204], [53136, 7.38216], [54432, 7.38228], [55728, 7.38238], [56565.5, 7.38244], [56565.5, 7.38244], [56694.6, 7.38245], [56694.6, 7.38245], [56735.3, 7.38246], [56735.3, 7.38246], [57024, 7.38248], [57634.8, 7.38253], [57634.8, 7.38253], [57634.9, 7.38253], [57634.9, 7.38253], [57641.6, 7.38253], [57641.6, 7.38253], [58320, 7.38257], [59616, 7.38264], [59633.3, 7.38264], [59633.3, 7.38264], [60797.1, 7.38269], [60797.1, 7.38269], [60912, 7.38269], [61944.7, 7.38272], [61944.7, 7.38272], [61944.7, 7.38272], [61944.7, 7.38272], [62004.3, 7.38272], [62004.3, 7.38272], [62208, 7.38272], [62802.3, 7.38273], [62802.3, 7.38273], [62802.3, 7.38273], [62802.3, 7.38273], [62815.3, 7.38273], [62815.3, 7.38273], [63504, 7.38274], [64800, 7.38275], [66096, 7.38276], [67392, 7.38275], [67803.3, 7.38275], [67803.3, 7.38275], [67803.3, 7.38275], [67803.3, 7.38275], [67803.5, 7.38275], [67803.5, 7.38275], [67814.4, 7.38275], [67814.4, 7.38275], [67831.9, 7.38275], [67831.9, 7.38275], [68119.3, 7.38275], [68119.3, 7.38275], [68688, 7.38275], [69984, 7.38274], [71280, 7.38273], [72576, 7.38272], [73872, 7.38271], [75081, 7.3827], [75081, 7.3827], [75081, 7.3827], [75081, 7.3827], [75081.1, 7.3827], [75081.1, 7.3827], [75086.2, 7.3827], [75086.2, 7.3827], [75088.8, 7.3827], [75088.8, 7.3827], [75168, 7.38269], [76464, 7.38268], [77760, 7.38267], [79056, 7.38265], [80352, 7.38264], [81648, 7.38262], [82944, 7.38261], [84240, 7.38259], [85536, 7.38258], [85790.8, 7.38257], [85790.8, 7.38257], [86832, 7.38256], [87370.3, 7.38255], [87370.3, 7.38255], [88128, 7.38254], [89424, 7.38253], [90720, 7.38251], [92016, 7.3825], [93310.5, 7.38249], [93310.5, 7.38249], [93312, 7.38249], [94608, 7.38247], [94810.5, 7.38247], [94810.5, 7.38247], [95904, 7.38246], [97200, 7.38245], [98496, 7.38243], [99028.9, 7.38243], [99028.9, 7.38243], [99032.3, 7.38243], [99032.3, 7.38243], [99032.4, 7.38243], [99032.4, 7.38243], [99792, 7.38242], [101088, 7.38241], [102384, 7.3824], [103680, 7.38239], [104976, 7.38238], [106272, 7.38237], [107568, 7.38236], [108664, 7.38236], [108664, 7.38236], [108664, 7.38236], [108664, 7.38236], [108664, 7.38236], [108664, 7.38236], [108674, 7.38236], [108674, 7.38236], [108675, 7.38236], [108675, 7.38236], [108864, 7.38236], [110160, 7.38235], [111456, 7.38234], [112752, 7.38234], [114048, 7.38233], [115344, 7.38233], [116640, 7.38233], [117936, 7.38232], [119232, 7.38232], [120528, 7.38232], [121824, 7.38232], [123120, 7.38233], [124416, 7.38233], [125712, 7.38233], [126756, 7.38234], [126756, 7.38234], [126756, 7.38234], [126756, 7.38234], [126756, 7.38234], [126756, 7.38234], [126758, 7.38234], [126758, 7.38234], [126759, 7.38234], [126759, 7.38234], [126773, 7.38234], [126773, 7.38234], [126775, 7.38234], [126775, 7.38234], [126816, 7.38234], [126816, 7.38234], [126904, 7.38234], [126904, 7.38234], [127008, 7.38234], [128304, 7.38234], [129600, 7.38234], [130896, 7.38234], [131086, 7.38234], [131086, 7.38234], [131087, 7.38234], [131087, 7.38234], [131087, 7.38234], [131087, 7.38234], [132192, 7.38235], [133488, 7.38235], [134784, 7.38235], [136080, 7.38236], [137376, 7.38237], [138672, 7.38237], [139968, 7.38238], [141264, 7.38239], [142560, 7.3824], [143856, 7.38241], [144392, 7.38242], [144392, 7.38242], [144393, 7.38242], [144393, 7.38242], [144393, 7.38242], [144393, 7.38242], [144403, 7.38242], [144403, 7.38242], [144405, 7.38242], [144405, 7.38242], [145152, 7.38242], [146448, 7.38243], [147744, 7.38244], [149040, 7.38245], [150336, 7.38247], [151632, 7.38248], [152928, 7.38249], [154224, 7.38251], [154576, 7.38251], [154576, 7.38251], [154576, 7.38251], [154576, 7.38251], [154577, 7.38251], [154577, 7.38251], [154577, 7.38251], [154577, 7.38251], [154578, 7.38251], [154578, 7.38251], [154582, 7.38251], [154582, 7.38251], [154583, 7.38251], [154583, 7.38251], [155520, 7.38252], [156816, 7.38254], [158112, 7.38255], [159408, 7.38257], [160704, 7.38259], [162000, 7.3826], [163296, 7.38262], [164592, 7.38264], [165888, 7.38266], [167184, 7.38268], [168480, 7.3827], [169776, 7.38272], [171059, 7.38275], [171059, 7.38275], [171059, 7.38275], [171059, 7.38275], [171059, 7.38275], [171059, 7.38275], [171065, 7.38275], [171065, 7.38275], [171067, 7.38275], [171067, 7.38275], [171072, 7.38275], [172368, 7.38277], [173664, 7.38279], [174960, 7.38281]]
+                //[11:10:37.278] [["Time", "ratio[1]", ""], ["0.0000000E+000", "2.6930647E-007", ""], ["2.0000001E-003", "1.3929956E-003", ""], ["4.0000002E-003", "2.8896495E-003", ""], ["6.0000001E-003", "4.5002350E-003", ""], ["8.0000004E-003", "6.2327823E-003", ""], ["9.9999998E-003", "8.0947839E-003", ""], ["1.2000000E-002", "1.0093545E-002", ""], ["1.4000000E-002", "1.2236326E-002", ""], ["1.6000001E-002", "1.4530418E-002", ""], ["1.7999999E-002", "1.6983181E-002", ""], ["2.0000000E-002", "1.9602070E-002", ""], ["2.2000000E-002", "2.2394652E-002", ""], ["2.4000000E-002", "2.5368614E-002", ""], ["2.6000001E-002", "2.8531777E-002", ""], ["2.8000001E-002", "3.1892087E-002", ""], ["2.9999999E-002", "3.5457637E-002", ""], ["3.2000002E-002", "3.9236654E-002", ""], ["3.4000002E-002", "4.3237500E-002", ""], ["3.5999998E-002", "4.7468688E-002", ""], ["3.7999999E-002", "5.1938858E-002", ""], ["3.9999999E-002", "5.6656800E-002", ""], ["4.1999999E-002", "6.1631437E-002", ""], ["4.4000000E-002", "6.6871837E-002", ""], ["4.600
+                //data for Roughton
+                              //var data =  [["Time", "ratio[1]"],[0, 2.6930647e-7], [0.0020000001, 0.0013929956], [0.0040000002, 0.0028896495], [0.0060000001, 0.004500235], [0.0080000004, 0.0062327823], [0.0099999998, 0.0080947839], [0.012, 0.010093545], [0.014, 0.012236326], [0.016000001, 0.014530418], [0.017999999, 0.016983181], [0.02, 0.01960207], [0.022, 0.022394652], [0.024, 0.025368614], [0.026000001, 0.028531777], [0.028000001, 0.031892087], [0.029999999, 0.035457637], [0.032000002, 0.039236654], [0.034000002, 0.0432375], [0.035999998, 0.047468688], [0.037999999, 0.051938858], [0.039999999, 0.0566568], [0.041999999, 0.061631437], [0.044, 0.066871837], [0.046, 0.072387181], [0.048, 0.078186817], [0.050000001, 0.0842802], [0.052000001, 0.090676926], [0.054000001, 0.097386718], [0.056000002, 0.10441941], [0.057999998, 0.11178498], [0.059999999, 0.11949352], [0.061999999, 0.12755524], [0.064000003, 0.13598046], [0.066, 0.14477959], [0.068000004, 0.15396322], [0.07, 0.16354197], [0.071999997, 0.17352663], [0.074000001, 0.18392801]]
+                              var data2 = data.slice();
+                              var selectedModel;
+                              var graphsettings2_empty = true;
+                              var graphsettings4_empty = true;
+                              data2.shift();
+                              data2.map(parseFloat);
+                              data2.pop(); //pop to remove last row with empty data
+                              var glabels = data[0];
+                              xaxis = 'X';
+                              yaxis = 'Y';
+                              var g2 = new Dygraph(document.getElementById("graph1"), data2, {
+                                  title: 'Experimentální data',
+                                  drawPoints: true,
+                                  labels: glabels,
+                                  showRangeSelector: true
+                              });
+                              var lastdto;
+
+                              $("#dataTable").handsontable({
+                                  data: data,
+                                  rowHeaders: true,
+                                  colHeaders: [xaxis, yaxis, yaxis + "1", yaxis + "2", yaxis + "3", yaxis + "4"],
+
+                                  currentRowClassName: 'currentRow',
+                                  currentColClassName: 'currentCol',
+                                  
+                                  minSpareRows: 1,
+                                  minSpareCols: 1,
+                                  fillHandle: true,
+                                  contextMenu: ['row_above', 'row_below', 'remove_row', 'col_left', 'col_right', 'remove_col'],
+                                  onChange: function (change, source) {
+                                      //convert data to float
+                                      data3 = data.slice();
+                                      data3.shift(); //first row contains string description of columns
+                                      data3.pop(); // to remove last row with empty data
+                                      data2 = data3.map(myparseFloat);
+                                      glabels = data[0].slice(0, data[0].length - 1); //remove last empty
+                                      g2.updateOptions({ 'file': data2, 'labels': glabels });
+
+                                  }
+                              });
+
+                          </script>
+                      </div>
+
+
+
+
+                      <div id="tabpage_3" class="tabpage">
+                          <h2 class="tabset_label">Parameters</h2>
+                          <p>Fill name of parameters, estimated limits, check if you want to identify parameters, otherwise fill initial value.
+                                 To copy&amp;paste (CTRL-C CTRL-V) ensure that the values are "TAB" separated, unfortunately comma separated are not yet implemented.</p>
+                          <p>
+                          </p>
+                          <div id="parameterTable"></div>
+                          <script>
+                              var parameters = [{ name: "a", isActive: true, value: 6, min: 0, max: 10 },
+                                  { name: "b", isActive: true, value: 2, min: -2, max: 2 },
+                                  { name: "c", isActive: true, value: 6, min: 0, max: 6 },
+                                  { name: "d", isActive: true, value: 0.3, min: 0, max: 10 }
+                              ];
+                              //vara parameters for hummod
+                              //var parameters = [{ name: "gases.acidBase.ArtysPh.cHb", isActive: true, value: "50", min: "30", max: "70"}];
+                              //parameters for Roughton
+                              //var parameters =  [{name:"K0", isActive:true, value:"221", min:"10", max:"2000"}, {name:"K1", isActive:true, value:"149", min:"10", max:"2000"}, {name:"K2", isActive:true, value:"9.55e+10", min:"1e+9", max:"1e+11"}, {name:"K3", isActive:true, value:"1.13e-7", min:"1e-8", max:"1e-6"}]
+                              $("#parameterTable").handsontable({
+                                  data: parameters,
+                                  rowHeaders: true,
+                                  colHeaders: ["name","identify?","initial value","minimum","maximum"],
+                                  columns: [
+                                      { data: "name" },
+                                      { data: "isActive", type: 'checkbox' },
+                                      { data: "value"},
+                                      { data: "min" },
+                                      { data: "max" }
+                                  ],
+                                  currentRowClassName: 'currentRow',
+                                  currentColClassName: 'currentCol',
+                                  minSpareRows: 1,
+                                  minSpareCols: 0,
+                                  fillHandle: true,
+                                  contextMenu: ['row_above', 'row_below', 'remove_row'],
+                                  onChange: function (change, source) {
+                                      //convert parameters??
+
+                                  }
+                              });
+                          </script>
+
+                      </div>
+                      <div id="tabpage_4" class="tabpage">
+                          <h2>Identification</h2>
+                          <p>Identification algorithm is time demanding, the computation can be distributed to NGI in Czech Republic (METACENTRUM - CESNET, cloud CERIT-SC) or EGI - grid & cloud for scientific purposes in European level.
+                          </p>
+                          <div id="identGraph"></div>
+                          <div id="computationParamsTable"></div>                          
+                          <div id="buttons">
+                              
+                              <button type="button" id="startIdentification">Start</button>    
+                              <button type="button" id="stopIdentification" display="none">Stop</button>    
+                          </div>                         
+                          <div id="identTable"></div>
+                          <div id="identTimeGraph"></div>
+
+                          <div id="messagewrapper">
+                              <ul id="messages"><li>Messages</li><li>...</li></ul>
+                          </div>
+                          <div id="graphsettingswrapper">
+                          <p id="graphsettings"><b>Show Series:</b></p>
+                              <p id="graphsettings2">
+                                  <input type=checkbox id="0" checked onClick="changeVisibility(this)">
+                                      <label for="0"> experiment</label><br/></input>      
+                              </p>
+                              </div>
+
+                          <script>
+                              var g3 = new Dygraph(document.getElementById("identGraph"), data2, {
+                                  title:"Experiment sample vs. current estimate",
+                                  drawPoints: true,
+                                  labels: glabels,
+                                  showRangeSelector: true
+                              }); //TODO data for g3 will be from server
+                              var dataTime = [];
+                              var computationParams = [[2000,10,1.0e-20]];
+                              var estimatedTime = 0;
+                              var g3time = new Dygraph(document.getElementById("identTimeGraph"), dataTime, {
+                                  title: "computation performance",
+                                  drawPoints:true,
+                                  labels: ["time","count/sec"],
+                                  showRangeSelector: false
+                              });                              
+                              var estimatedParameters = [["a",0.7]];
+                              
+                              var fakeidentifystate = $.connection.fakeidentifystate;
+                              //change visibility of series in graph
+                              function changeVisibility(el) {
+                                  g3.setVisibility(parseInt(el.id), el.checked);                                  
+                              }
+        // Declare a function on the hub so the server can invoke it
+        /*fakeidentifystate.client.currentParams = function (paramsdata) {
+                                  //console.log(paramsdata);
+                                  $("#identTable").handsontable('loadData', paramsdata);
+                              };*/
+                              fakeidentifystate.client.closeIdentifyProcessandResultUpdate = function (resultDTO, resultnames) {
+                                  fakeidentifystate.client.closeIdentifyProcess(resultDTO);
+                                  fakeidentifystate.client.updateResults(resultnames);
+                              };
+                              fakeidentifystate.client.closeIdentifyProcess = function (identifyDTO) {
+                                  
+                                  
+                                  $('#messages').append('<li> Final result: ' + identifyDTO.Parametervalues+'</li>');
+                                  $('#messages').append('<li> Elapsed time: ' + identifyDTO.elapsedtime + '</li>');
+                                  //remove first <li> if the number of messages is too long.
+                                  //console.log("number of li " + $('#messages li').length);
+                                  if ($('#messages li').length > 10) $('#messages li:first').remove();
+                                  fakeidentifystate.client.updateIdentifyProcess(identifyDTO);
+                              };
+
+
+                              fakeidentifystate.client.updateIdentifyProcess = function (identifyDTO) {
+                                  //console.log(identifyDTO);
+                                  lastdto = identifyDTO;
+                                  if (identifyDTO.Parameternames) {
+                                      var paramsdata = new Array();
+                                      for (i = 0; i < identifyDTO.Parameternames.length; i++) {
+                                          paramsdata[i] = [identifyDTO.Parameternames[i], identifyDTO.Parametervalues[i]];
+                                      }
+                                      $("#identTable").handsontable('loadData', paramsdata);
+                                  }
+                                  if (identifyDTO.Variablevalues) {
+                                      //console.log("id values " + identifyDTO.Variablevalues);
+                                      //var data4=data2 merge identifyDTO.Variablevalues[2] + identify;
+                                      //console.log(identifyDTO.Variablevalues);
+                                      data4 = [];
+                                      for (i = 0; i < data2.length; i++) {
+                                          //shifts variablevalues - time is not needed and concats to the experiment data
+                                          row = data2[i].slice();
+                                          row2 = identifyDTO.Variablevalues[i].slice(1);
+                                          //console.log("row, row2, row.concat row2");
+                                          //console.log(row);
+                                          //console.log(row2);
+                                          row3 = row.concat(row2);
+                                          //console.log(row3);
+                                          data4.push(row3);
+                                      } //data4=
+                                      //console.log("data4");
+                                      //console.log(data4);
+                                      glabels2 = glabels.slice();
+                                      //for each estimated variable push it to the label with e- prefix - I expect that the order of variablevalues and experiment data values are same 
+                                      for (i = 1; i < identifyDTO.Variablevalues[0].length; i++) glabels2.push("e-" + glabels[i]);
+                                      //console.log(glabels2);
+                                      //for glabels2 = glabels + 'estimation';
+                                      g3.updateOptions({ 'file': data4, 'labels': glabels2 });
+                                      //change the list of variables in visibility checkbox
+                                      if (graphsettings2_empty) {
+                                          $('#graphsettings2 input').remove();
+                                          $('#graphsettings2 label').remove();
+                                          $('#graphsettings2 br').remove();
+                                          for (i = 1; i < glabels2.length; i++) { //without time
+                                              $('#graphsettings2').append('<input type=checkbox id="' + (i - 1) + '" checked onClick="changeVisibility(this)"><label for="' + (i - 1) + '">' + glabels2[i] + '</label><br/></input>');
+                                              g3.setVisibility(i, true);
+                                          }
+                                          graphsettings2_empty = false;
+                                      }
+                                  }
+                                  //if (identifyDTO.countcycles > 0) $('#messages').append('<li> performed ' + identifyDTO.countcycles + ' estimations. </li>');
+                                  //if (identifyDTO.ssq > 0) $('#messages').append('<li> SSQ of result ' + identifyDTO.ssq + ' estimations. </li>');
+                                  if (identifyDTO.timepercycle > 0) {
+                                      var x = new Date();
+                                      var y = identifyDTO.countpercycle * 1000 / identifyDTO.timepercycle;
+                                      dataTime.push([x, y]);
+                                      g3time.updateOptions({ 'file': dataTime });
+                                      if (y > 0) {
+                                          estimatedTime = ([computationParams[0] * computationParams[1]] - identifyDTO.countcycles) / y;
+                                          fulltime = ([computationParams[0] * computationParams[1]]) / y;
+                                          $('#messages').append('<li>'+ identifyDTO.countcycles + ' simulací. Čas do konce ' + estimatedTime + 's. Čas výpočtu '+fulltime + 's</li>');
+                                      }
+                                  }
+                                  //public long countpercycle { get; set; }public int workerspercycle)
+                                  //remove first <li> if the number of messages is too long.
+                                  //console.log("number of li " + $('#messages li').length);
+                                  if ($('#messages li').length > 10) $('#messages li:first').remove();
+                                  //TODO variablebalues in graph
+
+                              };
+                              fakeidentifystate.client.currentMessage = function (message) {
+                                  $('#messages').append('<li>' + message + '</li>');
+                                  //remove first <li> if the number of messages is too long.
+                                  //console.log("number of li "+$('#messages li').length);
+                                  if ($('#messages li').length > 10) $('#messages li:first').remove();
+                              };
+
+                              fakeidentifystate.client.updateIdentifyState = function (IdentifyState) {
+                                  //  Initial,Running,Stopped,Finished
+                                  //console.log('identify state:' + IdentifyState);
+                                  graphsettings2_empty = true;
+                                  if (IdentifyState == 1) { //running
+                                      document.getElementById('startIdentification').style.visibility = 'hidden';
+                                      document.getElementById('stopIdentification').style.visibility = 'visible';
+                                  } else {
+                                      document.getElementById('startIdentification').style.visibility = 'visible';
+                                      document.getElementById('stopIdentification').style.visibility = 'hidden';
+                                  }
+
+                              };
+                              fakeidentifystate.client.updateModelsResults = function (models, results) {
+                                  fakeidentifystate.client.updateModels(models);
+                                  fakeidentifystate.client.updateResults(results);
+                              };
+
+                              fakeidentifystate.client.updateModels = function (models) {
+                                  console.log("update models");
+                                  console.log(models);
+                                  var selectionText = "";
+                                  var length = models.length;
+
+                                  for (var i = 0; i < length; i++) {
+                                      selectionText += "<option value='" + models[i].name + "'>" + models[i].name + " (" + models[i].count + ")</option>";
+                                  }
+                                  console.log(selectionText);
+                                  $('#models').html(selectionText);
+                              };
+
+         
+                              $("#identTable").handsontable({
+                                  data: estimatedParameters,
+                                  rowHeaders: true,
+                                  colHeaders: ["name", "estimated value"],           
+                                  currentRowClassName: 'currentRow',
+                                  currentColClassName: 'currentCol',
+                                  minSpareRows: 0,
+                                  minSpareCols: 0,
+                                  fillHandle: false
+                              });
+                              
+                              $("#computationParamsTable").handsontable({
+                                  data: computationParams,
+                                  rowHeaders: false,
+                                  colHeaders: ["generations", "populations","tolfun"],
+                                  currentRowClassName: 'currentRow',
+                                  currentColClassName: 'currentCol',
+                                  minSpareRows: 0,
+                                  minSpareCols: 0,
+                                  fillHandle: false
+                              });
+        // Start the connection
+                              $.connection.hub.start().done(function () {
+                                  $("#startIdentification").click(function () {
+                                      document.getElementById('startIdentification').style.visibility = 'hidden'; //prevent double clikc and sent two request
+                                      //document.getElementById('stopIdentification').style.visibility = 'visible';
+                                      // Collect data from table
+                                      myuserParams = $("#parameterTable").handsontable('getData');
+                                      dataTime = [];
+                                      var myuserArray = [];
+                                      var myuserArray2;
+                                      for (var i = 0; i < myuserParams.length; i++) {
+                                          var row = myuserParams[i];
+                                          if (row.name != null) {
+                                              myuserArray2 = [];
+                                              myuserArray2.push(row.name);
+                                              myuserArray2.push(row.isActive.toString());
+                                              myuserArray2.push(row.value.toString());
+                                              if (row.min != null) myuserArray2.push(row.min.toString());
+                                              if (row.max != null) myuserArray2.push(row.max.toString());
+                                              myuserArray.push(myuserArray2);
+                                          }
+                                      }
+                                      //send server to start identification process
+                                      //var myModel = $('#models').find(":selected").text();
+                                      //console.log("model:" + myModel);
+                                      computationParams = $("#computationParamsTable").handsontable('getData')[0];
+                                      console.log('computation params');
+                                      console.log(computationParams);
+                                      fakeidentifystate.server.startIdentify(myuserArray, glabels, data2, selectedModel, computationParams)
+                                          .fail(function (error) {
+                                              console.log("Failed to call startIdentifyObjects:", error);
+                                          });
+                                  });
+                                  $("#stopIdentification").click(function () {
+                                      //document.getElementById('startIdentification').style.visibility = 'visible';
+                                      document.getElementById('stopIdentification').style.visibility = 'hidden'; //prevent double click and sent double request to server.
+                                      fakeidentifystate.server.stopIdentify();
+                                  });
+
+                              });
+                          </script>
+
+                      </div>
+                      <div id="tabpage_5" class="tabpage">
+                          <h2>Results</h2>
+                          <p>Archive results, identified values of parameters, model simulation with parameters compared to sample data is shown in graph.
+                          </p>
+                          <select size="10" name="selectionField" id="selectresult" > 
+                              <option>Test</option>
+                          </select>
+                          <ul id="resultDescription">                              
+                          </ul>
+                          <button type="button" id="ResultLoadValues">Upload values</button>    
+                          This uploads values to the sample data table and parameters table in previous tabs. This can be reused to repeat the identification computation.
+                          <div id="resultTable"></div>
+                          
+                          <div id="resultGraph"></div>
+                          <script>
+
+                              fakeidentifystate.client.updateResults = function (results) {
+                                  console.log("update results");
+                                  console.log(results);
+                                  var selectionText = "";
+                                  var length = results.length;
+
+                                  for (var i = 0; i < length; i++) {
+                                      console.log("id " + results[i].Id + " name " + results[i].Name);
+
+                                      selectionText += "<option value='" + results[i].Id + "' onclick='changeResultView(this)'>" + results[i].Name + "</option>";
+                                  }
+                                  console.log(selectionText);
+                                  $('#selectresult').html(selectionText);
+                              };
+                              var resultData;
+                              function changeResultView(resultitem) {
+                                  //load data
+                                  console.log('result item');
+                                  console.log(resultitem.value);
+                                  var resulturl = "../resultDetails/"+resultitem.value;
+                                  jQuery.getJSON(resulturl, function (identifyDTO) {
+                                      console.log(identifyDTO);
+                                      resultData = identifyDTO;
+                                      //        public long Id { get; set; }
+                                      //        public string model { get; set; }
+                                      /*        public string name { get; set; }
+                                      public long countcycles { get; set; }
+                                      public string elapsedtime { get; set; }
+                                      public string[] Variablenames { get; set; }
+                                      public double[][] Variablevalues { get; set; }
+                                      public double[][] Experimentalvalues { get; set; }
+                                      public string[] Parameternames { get; set; }
+                                      public double[] Parametervalues{ get; set; }
+                                      public double Ssq { get; set; }
+                                      */
+                                      //update table
+                                      var paramsidentifyDTO = new Array();
+                                      for (i = 0; i < identifyDTO.parameternames.length; i++) {
+                                          paramsidentifyDTO[i] = [identifyDTO.parameternames[i], identifyDTO.parametervalues[i]];
+                                      }
+                                      console.log(paramsidentifyDTO);
+                                      $("#resultTable").handsontable('loadData', paramsidentifyDTO);
+                                      //update graph
+
+                                      //if (identifyDTO.Variablevalues) { //TODO rename some variables as it may be changed in another context ...
+                                      //console.log("id values " + identifyDTO.Variablevalues);
+                                      //var identifyDTO4=identifyDTO2 merge identifyDTO.Variablevalues[2] + identify;
+                                      //console.log(identifyDTO.Variablevalues);
+                                      identifyDTO4 = [];
+                                      identifyDTO2 = identifyDTO.experimentalvalues;
+                                      for (i = 0; i < identifyDTO2.length; i++) {
+                                          //shifts variablevalues - time is not needed and concats to the experiment identifyDTO
+                                          row = identifyDTO2[i].slice();
+                                          row2 = identifyDTO.variablevalues[i].slice(1);
+                                          //console.log("row, row2, row.concat row2");
+                                          //console.log(row);
+                                          //console.log(row2);
+                                          row3 = row.concat(row2);
+                                          //console.log(row3);
+                                          identifyDTO4.push(row3);
+                                      } //identifyDTO4=
+                                      //console.log("identifyDTO4");
+                                      //console.log(identifyDTO4);
+                                      glabels2 = identifyDTO.variablenames.slice(); //TODO glabels not set
+                                      //for each estimated variable push it to the label with e- prefix - I expect that the order of variablevalues and experiment identifyDTO values are same 
+                                      for (i = 1; i < identifyDTO.variablevalues[0].length; i++) glabels2.push("e-" + glabels[i]);
+                                      //console.log(glabels2);
+                                      //for glabels2 = glabels + 'estimation';
+                                      g4.updateOptions({ 'file': identifyDTO4, 'labels': glabels2 });
+
+                                      $('#resultDescription li').remove();
+                                      $('#resultDescription').append('<li> ssq:' + identifyDTO.ssq + '</li>');
+                                      $('#resultDescription').append('<li> computation cycles:' + identifyDTO.countcycles + '</li>');
+                                      $('#resultDescription').append('<li> computation time:' + identifyDTO.elapsedtime + '</li>');
+                                  });
+                                  //update resultTable
+                                  //update resultGraph
+                              }
+
+
+                              var g4 = new Dygraph(document.getElementById("resultGraph"), data2, {
+                                  title:"experiment vs. výsledná identifikace",
+                                  drawPoints: true,
+                                  labels: glabels,
+                                  showRangeSelector: true
+                              });
+                              $("#resultTable").handsontable({
+                                  data: estimatedParameters,
+                                  rowHeaders: true,
+                                  colHeaders: ["name", "estimated value"],
+                                  currentRowClassName: 'currentRow',
+                                  currentColClassName: 'currentCol',
+                                  minSpareRows: 0,
+                                  minSpareCols: 0,
+                                  fillHandle: false
+                              });
+
+                              $("#ResultLoadValues").click(function () {
+                                  //var p1 = resultData.parameterAssignment.slice();
+                                  //console.log('debug resultloadvalues');
+                                  //console.log(p1);
+                                  parameters = resultData.parameterAssignment.slice();
+                                  $("#parameterTable").handsontable('loadData', parameters);
+                                  var p2 = resultData.variablenames.slice();
+                                  //console.log(p2);
+                                  var p3 = resultData.experimentalvalues.slice();
+                                  //console.log(p3);
+                                  var p4 = [];
+                                  p4[0] = p2;
+                                  p3.forEach(function (row2) {
+                                      //p5 = row2.slice();
+                                      //console.log(p5);
+                                      p4.push(row2);
+                                  });
+                                  console.log(p4);
+                                  data = p4;
+                                  $('#dataTable').handsontable('loadData', data);
+
+                              });
+
+                          </script>
+                      </div>
+                  </div>
+              </div>
+          </div>
+         <script type="text/javascript" src="../Scripts/javascript-tabs.js"></script>
+
+    </body>
+</html>

@@ -1,0 +1,26 @@
+#Model name
+Some name
+#N (dimension of data space), i.e. number of equations
+121
+#M (dimension of model space), i.e. number of unknowns
+4
+#Q (Population size). Recommended value is around 5-10 times the number
+20
+#N_ITER Number of allowed iteration cycles. (-1 = Do not care)
+-1
+#M_TIME Maximum allowed CPU time in seconds (-1 = Do not care)
+-1
+#M_EVAL Maximum allowed number of function evaluations (-1 = Do not care)
+800
+#M_FIT Desired norm of residuals to be reached (-1 = Do not care)
+1.000000e-004
+#FCN_LOCATION (full_path_to_file_name function_name)
+functions/ problemAnni
+#Model parameters
+#Parameter name	min	max
+p1	-43.700000	16.300000
+p2	-49.990000	10.010000
+p3	-46.940000	13.060000
+p4	-49.800000	10.200000
+#Number of desired roots, their critical distance
+1	0

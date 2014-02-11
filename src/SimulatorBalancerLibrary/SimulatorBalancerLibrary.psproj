@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.postsharp.org/1.0/configuration">
+  <Property Name="LoggingBackEnd" Value="nlog" />
+  <Using File="..\RestMasterService\packages\PostSharp.Patterns.Diagnostics.3.0.37\tools\PostSharp.Patterns.Diagnostics.Weaver.dll" />
+  <Using File="..\RestMasterService\packages\PostSharp.Patterns.Diagnostics.NLog.3.0.37\tools\PostSharp.Patterns.Diagnostics.Weaver.NLog.dll" />
+</Project>
