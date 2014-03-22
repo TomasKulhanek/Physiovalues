@@ -1,14 +1,14 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestMasterService", "RestMasterService.csproj", "{469714C9-EE2C-48FF-ADBC-74FF8586D6BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestMasterService", "..\src\RestMasterService\RestMasterService.csproj", "{469714C9-EE2C-48FF-ADBC-74FF8586D6BD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{456E3355-F296-4A00-977B-DFE87D46F75A} = {456E3355-F296-4A00-977B-DFE87D46F75A}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatorBalancerLibrary", "..\SimulatorBalancerLibrary\SimulatorBalancerLibrary.csproj", "{456E3355-F296-4A00-977B-DFE87D46F75A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatorBalancerLibrary", "..\src\SimulatorBalancerLibrary\SimulatorBalancerLibrary.csproj", "{456E3355-F296-4A00-977B-DFE87D46F75A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestFMuSimulator", "..\TestFMuSimulator\TestFMuSimulator.csproj", "{0D4DF89B-E9EB-4063-B555-32F7A404B108}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestFMuSimulator", "..\test\TestFMuSimulator\TestFMuSimulator.csproj", "{0D4DF89B-E9EB-4063-B555-32F7A404B108}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
