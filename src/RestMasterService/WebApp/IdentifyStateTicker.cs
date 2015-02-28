@@ -21,8 +21,10 @@ using System.Diagnostics;
 using SimulatorBalancerLibrary;
 using IdentifyDTO = RestMasterService.ComputationNodes.IdentifyDTO;
 using Worker = RestMasterService.ComputationNodes.Worker;
-
+using PostSharp.Patterns.Diagnostics;
 using PostSharp.Extensibility;
+
+//using PostSharp.Extensibility;
 
 namespace RestMasterService.WebApp
 {
@@ -45,8 +47,9 @@ namespace RestMasterService.WebApp
         private double IAgenerations = 0;
         private double IApopulationsize = 0;
         private double IAtolfun = 0;
-        //string masterserviceurl = "http://localhost/identifikace/";
-        string masterserviceurl = "http://localhost:51382/";
+        //TODO self detection
+        string masterserviceurl = "http://localhost/identifikace/";
+        //string masterserviceurl = "http://localhost:51382/";
         Random random = new Random();
         Logger logger = LogManager.GetLogger("MyClassName");
         //private readonly ConcurrentDictionary<string, Stock> _stocks = new ConcurrentDictionary<string, Stock>();
@@ -139,7 +142,8 @@ namespace RestMasterService.WebApp
             }
         }
         */
-        
+
+        [LogException]
         public void IdentifyComputation()
         {
             //set generic simulator behavior - strategy
@@ -185,14 +189,14 @@ namespace RestMasterService.WebApp
                 //BroadcastIdentifyStateMessage("Elapsed time " + sw.Elapsed.ToString() + " Results: " + result);//fitted_params+" "+fitted_param_L2Enorm+" " + fitted_variablevalues);
                 //var myresult = result.ToArray();
                 
-                BroadcastIdentifyResult(result.ToArray(),sw.Elapsed,class1.identify_getssq(),class1.identify_getcomputationcycles());
+                BroadcastIdentifyResult(result.ToArray(),sw.Elapsed,class1.identify_getssq(),class1.identify_getcomputationcycles(),class1.identify_getsimulationtime());
 
             }
             catch (Exception e)
             {
                 //TODO handle matlab exception
                 BroadcastIdentifyStateMessage(e.Message+e.StackTrace);
-                logger.ErrorException("exception during identification:",e);
+                logger.Log(NLog.LogLevel.Error,"exception during identification "+e.Message+" stacktrace:"+e.StackTrace,e);
             }
 //            StopIdentify();
             FinalizeIdentify();
@@ -200,7 +204,7 @@ namespace RestMasterService.WebApp
         }
 
         //result will contain ssq at last position
-        private void BroadcastIdentifyResult(object result, TimeSpan elapsed, object ssq, object compcycles)
+        private void BroadcastIdentifyResult(object result, TimeSpan elapsed, object ssq, object compcycles, object simtime)
         {
             var myresult = new List<double>();
             foreach (var o in (Double[,])result) myresult.Add(o);
@@ -209,7 +213,8 @@ namespace RestMasterService.WebApp
             //double myssq = 0;
 
             var myssq = ((MWArray) ssq).ToArray();//.GetValue(0));
-            var mycompcycles = ((MWArray) compcycles).ToArray(); 
+            var mycompcycles = ((MWArray) compcycles).ToArray();
+            var simulationtime = ((MWArray)simtime).ToArray(); 
                 //myssq = ssq;
             //var myssq = ((MWIndexArray) o).
             //TODO should it be implemented in MATLAB class instead of directly in here?
@@ -218,6 +223,7 @@ namespace RestMasterService.WebApp
             //var workers = (List<Worker>) myrepository.GetByModelName(identify.model);
             var workers = (List<Worker>)myrepository.GetByModelName(modelname);
             //compute on the first worker (expected that first worker is in localhost)
+            logger.Debug("masterservice url:"+masterserviceurl);
             var simulator = new GenericSimulator(modelname,masterserviceurl);
             var timepoints = new List<double>();
             foreach (var row in variable_values) timepoints.Add(row[0]); //add first number - time from each experiment value
@@ -227,7 +233,7 @@ namespace RestMasterService.WebApp
                                   {
                                       Ssq = (double)myssq.GetValue(0,0), //TODO debug
                                       countcycles = (long)mycompcycles.GetValue(0, 0), //TODO debug
-                                      elapsedtime = elapsed.ToString(),
+                                      elapsedtime = elapsed.ToString()+" simulation: "+simulationtime.GetValue(0,0).ToString(),
                                       name= "Result of "+modelname+" at "+DateTime.Now,
                                       model = modelname,
                                       Parameternames = parameters.Keys.ToArray(),
@@ -374,8 +380,41 @@ namespace RestMasterService.WebApp
         {
             if (port == 80) masterserviceurl = "http://localhost/identifikace/";//make configurable - hardcoded to physiome.lf1.cuni.cz
             else if (port > 0) masterserviceurl = "http://localhost:"+port+"/";//make configurable - hardcoded to physiome.lf1.cuni.cz
-
+            //masterserviceurl = GetBindings();
         }
+
+        private string GetBindings()
+        {
+            // Get the Site name 
+            string siteName = System.Web.Hosting.HostingEnvironment.SiteName;
+
+            // Get the sites section from the AppPool.config
+            
+           Microsoft.Web.Administration.ConfigurationSection sitesSection =
+                Microsoft.Web.Administration.WebConfigurationManager.GetSection(null, null, "system.applicationHost/sites");
+            
+            foreach (Microsoft.Web.Administration.ConfigurationElement site in sitesSection.GetCollection())
+            {
+                // Find the right Site
+                if (String.Equals((string)site["name"], siteName, StringComparison.OrdinalIgnoreCase))
+                {
+
+                    // For each binding see if they are http based and return the port and protocol
+                    foreach (Microsoft.Web.Administration.ConfigurationElement binding in site.GetCollection("bindings"))
+                    {
+                        string protocol = (string)binding["protocol"];
+                        string bindingInfo = (string)binding["bindingInformation"];
+
+                        if (protocol.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                        {
+                            string[] parts = bindingInfo.Split(':');
+                        if (parts.Length == 3) return "http://"+parts[2]+":"+parts[1]+"/";                            
+                        }
+                    }
+                }                
+            }
+            return "http://app.physiovalues.org/";
+        } 
 
         public void SetComputationParams(double[] computationParams)
         { //TODO use some DTO

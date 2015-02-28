@@ -43,6 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HumModFileConvert.cs" />
+    <Compile Include="HumModConvert.cs" />
+    <Compile Include="IConvertBehavior.cs" />
+    <Compile Include="PhysiomodelConvert.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

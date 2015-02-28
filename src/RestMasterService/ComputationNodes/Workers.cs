@@ -4,7 +4,7 @@ using System.Linq;
 using System.Configuration;
 using System.Collections.Generic;
 using NLog;
-
+using PostSharp.Patterns.Diagnostics;
 using RestMasterService.WebApp;
 using ServiceStack.Configuration;
 using ServiceStack.Common;
@@ -14,7 +14,8 @@ using ServiceStack.ServiceInterface.Auth;
 using ServiceStack.ServiceInterface.ServiceModel;
 using ServiceStack.WebHost.Endpoints;
 using PostSharp.Extensibility;
-using PostSharp.Patterns.Diagnostics;
+//using PostSharp.Extensibility;
+//using PostSharp.Patterns.Diagnostics;
 
 namespace RestMasterService.ComputationNodes
 {
@@ -69,21 +70,23 @@ namespace RestMasterService.ComputationNodes
             }
         }
 
-        [OutgoingHub]
+
+        [Log, OutgoingHub]
         public object Post(Worker w)
         {
             //logger.Debug("post " + w.ToString());
             return Repository.Store(w);
         }
 
-        [OutgoingHub]
+
+        [Log, OutgoingHub]
         public object Put(Worker w)
         {
             //logger.Debug("put " + w.ToString());
             return Repository.Store(w);
         }
 
-        [OutgoingHub]
+        [Log, OutgoingHub]
         public void Delete(Workers request)
         {
             //logger.Debug("delete "+request.ToString());

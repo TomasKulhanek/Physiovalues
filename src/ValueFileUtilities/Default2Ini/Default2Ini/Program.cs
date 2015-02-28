@@ -22,30 +22,155 @@ namespace Default2Ini
                 }
                 else if (args[0].Equals("m"))
                 {
-                    if (args.Length > 3) IniFile2ModelFile(args[1], args[2],args[3]);
+                    if (args.Length == 4) IniFile2ModelFile(args[1], args[2],args[3],"n");
+                    else if (args.Length > 4) IniFile2ModelFile(args[1], args[2], args[3], args[4]);
                 }
+                else if (args[0].Equals("p"))
+                {
+                    if (args.Length > 3) IniFile2PhysioModelFile(args[1], args[2], args[3]);
+                    //else if (args.Length > 4) IniFile2ModelFile(args[1], args[2], args[3], args[4]);
+                }
+                else if (args[0].Equals("d"))
+                {
+                    if (args.Length > 2) DsFile2IniFile(args[1], args[2]);
+                }
+                else if (args[0].Equals("2"))
+                {
+                    if (args.Length > 2) DsFile2DsFile(args[1], args[2]);
+                }
+
                 else Help();
             }
             else Help();
         
         }
 
-        private static void Help()
+        private static void DsFile2DsFile(string s, string s1)
         {
-            Console.WriteLine(
-                "Usage: \nc [defaultfile] [inifile]\n    converts default file to inifile\nm [inifile] [modelfile]\nm     converts inifile to modelica");
+            TextReader dsFile = null;
+            TextWriter iniFile = null;
+            String[] lineElements;
+            if (File.Exists(s))
+            {
+                try
+                {
+                    dsFile = new StreamReader(s);
+                    iniFile = new StreamWriter(s1);
+                    string strLine,strLine2;
+                    do
+                    {
+                        strLine = dsFile.ReadLine();
+                        strLine2 = dsFile.ReadLine();
+                        iniFile.WriteLine(strLine + strLine2);
+                    } while (strLine != null);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (iniFile != null)
+                        iniFile.Close();
+                    if (dsFile != null)
+                        dsFile.Close();
+                }
+            }
         }
 
-        private static void IniFile2ModelFile(string inifile, string modelfile1, string modelfile2)
+        private static void IniFile2PhysioModelFile(string inifile, string modelfile1, string modelfile2)
         {
             //throw new NotImplementedException();
             var pairs = ReadIniFile(inifile);
-            WriteModel(modelfile1,modelfile2, pairs);
+            WriteModel(modelfile1, modelfile2, pairs, "", new PhysiomodelConvert());
         }
 
-        private static void WriteModel(string mf1,string mf2, Dictionary<string, string> pairs)
+        private static void Help()
+        {
+            Console.WriteLine(
+            "Usage: \n" +
+            "c [defaultfile] [inifile]\n" +
+            "    converts default file to inifile\n"+
+            "m [inifile] [inputmodelfile] [outputmodelfile2] [n|f]\n" +
+            "     adds values from inifile to hummod (till 2014) modelica model\n" +
+            "     adds 'varValue= k' to coresponding Physiolibrary.Utilities.ConstantFromFile\n" +
+            "     adds 'varValue=k' to coresponding Variable\n" +
+            "     last argument is either default 'n' for initType = Init.NoInit \n" +
+            "     or 'c' = Init.FromFile which cause reading the default.txt from file again\n" +
+            "p [inifile] [inputmodelfile] [outputmodelfile]\n" +
+            "     adds values from defaultfile to physiomemodel (from 2014 and later) modelica model\n" +
+            "     similar to 'm' switch.\n"+
+            "d [dsin.txt] [dsin.ini]\n" +
+            "     converts Dymola dsin.txt file to ini file with varname=varvalue\n" +
+            "2 [dsfile.txt] [dsfile2014.txt]\n" +
+            "     joins 2 lines into 1 line, preparation from Dymola2015 version to Dymola2014 version\n" +
+            ""
+            );
+        }
+
+
+        private static void DsFile2IniFile(string arg1, string arg2)
+        {
+            //throw new Exception("The method or operation is not implemented.");
+            TextReader dsFile = null;
+            TextWriter iniFile = null;
+            String[] lineElements;
+            if (File.Exists(arg1))
+            {
+                try
+                {
+                    dsFile = new StreamReader(arg1);
+                    iniFile = new StreamWriter(arg2);
+                    var strLine = dsFile.ReadLine();
+                    var fillvalues = false;
+                    while (strLine != null)
+                    {
+                        //split by space
+                        if (fillvalues)
+                        {
+                            lineElements = strLine.Split(" ".ToCharArray(), 8, StringSplitOptions.RemoveEmptyEntries);
+                            fillvalues = lineElements.Length >= 8;
+                            //ignore iconpoints (with [])
+                            //
+                            if (fillvalues)
+                                //if (!lineElements[7].EndsWith("]")) 
+                                    iniFile.WriteLine(lineElements[7] + "=" + lineElements[1]);                            
+                        }
+                        else
+                        {
+                            fillvalues = strLine.StartsWith("double initialValue");
+                        }
+                        strLine = dsFile.ReadLine();
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (iniFile != null)
+                        iniFile.Close();
+                    if (dsFile != null)
+                        dsFile.Close();
+                }
+            }
+        }
+
+
+        private static void IniFile2ModelFile(string inifile, string modelfile1, string modelfile2, string initType)
+        {
+            //throw new NotImplementedException();
+            var pairs = ReadIniFile(inifile);
+            if (initType.Equals('f')) WriteModel(modelfile1,modelfile2, pairs,initType, new HumModFileConvert());
+                WriteModel(modelfile1,modelfile2, pairs,initType, new HumModConvert());
+        }
+
+        private static void WriteModel(string mf1,string mf2, Dictionary<string, string> pairs, string initType,IConvertBehavior C)
         {
          //   throw new NotImplementedException();
+            
             TextReader defaultFile = null;
             TextWriter iniFile = null;
             if (File.Exists(mf1))
@@ -55,14 +180,18 @@ namespace Default2Ini
                     defaultFile = new StreamReader(mf1);
                     iniFile = new StreamWriter(mf2);
                     var strLine = defaultFile.ReadLine();
+                    var nextstrLine = defaultFile.ReadLine();
                     while (strLine != null)
                     {
                         //strLine = strLine.Trim(); //.ToUpper();
-                        //iniFile.WriteLine(strLine + "=" + defaultFile.ReadLine());
-                        if (CheckVariables(strLine)) strLine = ConvertVariables(strLine, pairs);
-                        else if (CheckConstant(strLine)) strLine = convertConstant(strLine, pairs);
+                        //iniFile.WriteLine(strLine + "=" + defaultFile.ReadLine());                        
+                        bool usedNextStrline = false;
+                        if (C.CheckVariables(strLine)) strLine = C.ConvertVariables(strLine, pairs, nextstrLine,ref usedNextStrline);
+                        else if (C.CheckConstant(strLine)) strLine = C.ConvertConstant(strLine, pairs, nextstrLine, ref usedNextStrline);
                         iniFile.WriteLine(strLine);
-                        strLine = defaultFile.ReadLine();
+                        if (!usedNextStrline) strLine = nextstrLine;
+                        else strLine = defaultFile.ReadLine();
+                        nextstrLine = defaultFile.ReadLine();
 
                     }
 
@@ -81,41 +210,6 @@ namespace Default2Ini
             }
         }
 
-        private static string convertConstant(string strLine, Dictionary<string, string> pairs)
-        {
-            var regex = new Regex("varName = \"([^\"]*)[^\\)]*");
-            var match = regex.Match(strLine);
-            if (match.Success)
-            {
-                var varValue = pairs[match.Groups[1].Value];//Regex.Find(strLine, regex)];
-                return regex.Replace(strLine, "varName = \"$1\", varValue = \"" + varValue + "\"");
-            }
-            else return strLine;
-        }
-
-        private static string ConvertVariables(string strLine, Dictionary<string, string> pairs)
-        {
-            var regex = new Regex("varName = \"([^\"]*)[^\\)]*");
-            var match = regex.Match(strLine);
-            if (match.Success)
-            {
-                var varValue = pairs[match.Groups[1].Value];//Regex.Find(strLine, regex)];
-                return regex.Replace(strLine, "varName = \"$1\",varValue = \"" + varValue + "\"");
-            }
-            else return strLine;
-            //var varValue = pairs[Regex.Find(strLine,regex)];
-            //return Regex.Replace(strLine, regex,"varname = \"$1\" varValue = \"" + varValue + "\"");
-        }
-
-        private static bool CheckConstant(string strLine)
-        {
-            return Regex.IsMatch(strLine, "[ ]*Physiolibrary\\.Utilities\\.ConstantFromPhysiovalues");
-        }
-
-        private static bool CheckVariables(string strLine)
-        {
-            return Regex.IsMatch(strLine, "[ ]*Variable");
-        }
 
         /// <summary>
         /// Opens the INI file at the given path and enumerates the values in the IniParser.
@@ -147,8 +241,14 @@ namespace Default2Ini
 
                             if (keyPair.Length > 1)
                                 value = keyPair[1];
-
-                            keyPairs.Add(keyPair[0], value);
+                            try
+                            {
+                                keyPairs.Add(keyPair[0], value);
+                            }
+                            catch (ArgumentException ex)
+                            {
+                                Console.WriteLine("Duplicate variable:{0}",keyPair[0]);
+                            }
                         }
                         strLine = iniFile.ReadLine();
                     }

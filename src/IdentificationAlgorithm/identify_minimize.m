@@ -13,7 +13,7 @@ function [p_fitted, val] = identify_minimize(experiment, p_names, p_min,p_max, p
     %alg_opt
     %verbose .. verbose output (true/false)
     %gr .. grid to evaluate model on
-
+identify_logs('identify_minimize','debug');
     [temp_var, n_par] = size(p_val);
     n_fixed = sum(p_is_fixed);
     p_fixed_val = zeros(1,n_fixed);

@@ -14,5 +14,6 @@ namespace SimulatorBalancerLibrary
         string Description();
         long GetComputationCycles();
         void FinishSimulate();
+        long GetSimulationTime();
     }
 }

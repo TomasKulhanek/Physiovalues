@@ -32,6 +32,11 @@ namespace SimulatorBalancerLibrary
             return SimulatorBehavior.GetComputationCycles();
         }
 
+        public long GetSimulationTime()
+        {
+            return SimulatorBehavior.GetSimulationTime();
+        }
+
         public void FinishSimulate()
         {
             SimulatorBehavior.FinishSimulate();

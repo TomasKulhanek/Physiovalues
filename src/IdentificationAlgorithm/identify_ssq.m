@@ -30,7 +30,7 @@ function L2E = identify_ssq(net_model_data)
 %            d = abs((y_e(min_ind:max_ind) - y_m_interp).*dx_e_trimed);
     end
     catch err
-        %identify_logs('exception in ssq',err);%,net_model_data);
+        identify_logs('exception in ssq',err.message+err.stacktrace);%,net_model_data);
         %rethrow(err);
         L2E= 1e+10;
     end

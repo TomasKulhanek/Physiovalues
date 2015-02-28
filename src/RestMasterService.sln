@@ -1,14 +1,20 @@
-
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestMasterService", "..\src\RestMasterService\RestMasterService.csproj", "{469714C9-EE2C-48FF-ADBC-74FF8586D6BD}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30324.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestMasterService", "RestMasterService\RestMasterService.csproj", "{469714C9-EE2C-48FF-ADBC-74FF8586D6BD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{456E3355-F296-4A00-977B-DFE87D46F75A} = {456E3355-F296-4A00-977B-DFE87D46F75A}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatorBalancerLibrary", "..\src\SimulatorBalancerLibrary\SimulatorBalancerLibrary.csproj", "{456E3355-F296-4A00-977B-DFE87D46F75A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatorBalancerLibrary", "SimulatorBalancerLibrary\SimulatorBalancerLibrary.csproj", "{456E3355-F296-4A00-977B-DFE87D46F75A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestFMuSimulator", "..\test\TestFMuSimulator\TestFMuSimulator.csproj", "{0D4DF89B-E9EB-4063-B555-32F7A404B108}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DBF37CFB-FC88-4FD3-93D7-40FACD17B0AD}"
+	ProjectSection(SolutionItems) = preProject
+		RestMasterService.pssln = RestMasterService.pssln
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

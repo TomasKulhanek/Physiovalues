@@ -31,6 +31,7 @@ namespace RestMasterService.ComputationNodes
         public double[] Parametervalues{ get; set; }
 //        public double Ssq { get; set; }
         public long timepercycle { get; set; }
+        public long simulationtime { get; set; }
         public long countpercycle { get; set; }
         public int workerspercycle { get; set; }
     }

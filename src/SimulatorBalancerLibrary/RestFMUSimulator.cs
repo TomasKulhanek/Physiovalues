@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using NLog;
 using RestMasterService.ComputationNodes;
 using ServiceStack.ServiceClient.Web;
 using ServiceStack.ServiceHost;
@@ -10,6 +11,8 @@ using ServiceStack.ServiceHost;
 using System.Linq;
 using PostSharp.Patterns.Diagnostics;
 using PostSharp.Extensibility;
+//using PostSharp.Patterns.Diagnostics;
+//using PostSharp.Extensibility;
 /*using System.Configuration;
 using System.Collections.Generic;
 //using RestMasterService.WebApp;
@@ -31,9 +34,11 @@ namespace SimulatorBalancerLibrary
         private string updateWorkerListURL;
         private string ModelName;
         private long computationcycle = 0;
+        private long computationtime;
         private long lastcomputationcycle= 0 ;
         private long identid;
         private Stopwatch stopwatch=new Stopwatch();
+        private Logger logger = LogManager.GetLogger("RestFMUSimulator");
         public RestFMUSimulator(string modelName,string updateURL)
         {
             ModelName = modelName;
@@ -41,6 +46,7 @@ namespace SimulatorBalancerLibrary
             updateWorkerListURL = updateURL;
             updateIdentifyProcessURL = updateURL;
             computationcycle = 0;
+            computationtime = 0;
             identid = 0;
 //            RestURLs = getWorkerURLs(modelName);
         }
@@ -85,6 +91,8 @@ namespace SimulatorBalancerLibrary
             }*/
             //parallel computation
             int j = 0;
+            var sw = new Stopwatch();
+            sw.Start();
             while (j<parametervalues.Length)
             {
 
@@ -133,6 +141,8 @@ namespace SimulatorBalancerLibrary
                 
 
             }
+            sw.Stop();
+            computationtime += sw.ElapsedMilliseconds;
             //update
             UpdateIdentifyProcess(parameternames,parametervalues,result);
             //getWorkerURLs(this.ModelName); update worker list moved to updateidentifyprocess - to update each 5 seconds - otherwise excessive calling of this method seems to cause memory consumption
@@ -157,7 +167,7 @@ namespace SimulatorBalancerLibrary
         }
 
         private bool repeatComp = false;
-        private List<repeatCompStruct> repeatList;
+        private List<repeatCompStruct> repeatList = new List<repeatCompStruct>();
         private repeatCompParams rp;
         private void setRepeatComputation(int wrongServiceIndex, int paramvaluesmin, int paramvaluesmax, ref string[] parameternames, ref double[][] parametervalues, ref string[] variablenamesinresult, ref double[] timepoints,ref double[][][] result)
         {
@@ -196,6 +206,7 @@ namespace SimulatorBalancerLibrary
         }
 
         //TODO move to another object to keep POCO
+        [Log]
         private void UpdateIdentifyProcess(string[] parameternames, double[][] parametervalues, double[][][] result)
         {
             if (!stopwatch.IsRunning) { stopwatch.Start(); lastcomputationcycle = computationcycle; }
@@ -223,6 +234,7 @@ namespace SimulatorBalancerLibrary
                                                                    Parametervalues = parametervalues[0],
                                                                    Variablevalues = result[0],
                                                                    timepercycle = elapsedmilis,
+                                                                   simulationtime = computationtime,
                                                                    countpercycle = computationcycle-lastcomputationcycle,
                                                                    workerspercycle = workerspercycle
                                                                });
@@ -238,7 +250,8 @@ namespace SimulatorBalancerLibrary
                                           Parametervalues = parametervalues[parametervalues.Length-1], //vrati posledni parametry ze sekvence
                                           Variablevalues = result[result.Length-1], //vrati vysledek vztahujici se k poslednim parametrum parametervalues.length==result.Length
                                           timepercycle = elapsedmilis,
-                                          countpercycle = computationcycle-lastcomputationcycle,
+                                          simulationtime = computationtime,
+                                          countpercycle = computationcycle - lastcomputationcycle,
                                           workerspercycle = workerspercycle
                                       };
 
@@ -246,7 +259,7 @@ namespace SimulatorBalancerLibrary
                 }
             } catch (Exception e)
             {
-                //TODO log the error only
+                logger.Log(NLog.LogLevel.Error, "computation eception",e);//TODO log the error only
             }
             finally
             {
@@ -255,13 +268,14 @@ namespace SimulatorBalancerLibrary
         }
 
 
-        
+
+        [Log]
         public double[][] Simulate(string wurl,string[] parameternames, double[] parametervalues, string[] variablenamesinresult, double[] timepoints)
         {
             return Compute(wurl, parameternames, parametervalues, timepoints,variablenamesinresult);
         }
 
-
+        [Log]
         public double[][] Simulate(string[] parameternames, double[] parametervalues, string[] variablenamesinresult, double[] timepoints)
         {
             getWorkerURLs(this.ModelName);
@@ -273,7 +287,7 @@ namespace SimulatorBalancerLibrary
 
 
 
-        [LogException]
+        //[LogException]
         public double[][] Compute(string simulateworkerurl, string[] parameternames, double[] doubles, double[] timepoints, string[] variablenamesinresult)
         {            
             var client = new JsonServiceClient(simulateworkerurl);
@@ -300,6 +314,7 @@ namespace SimulatorBalancerLibrary
             } catch (Exception e) //computation node error
                             {
                                 //setRepeatComputation(k, j + k * l2, j + k * l2 + l4, ref parameternames, ref parametervalues, ref variablenamesinresult,ref timepoints,ref result);
+                logger.Log(NLog.LogLevel.Error,"computation error:",e);
                                 return null;
                             }
 
@@ -313,6 +328,11 @@ namespace SimulatorBalancerLibrary
         public long GetComputationCycles()
         {
             return computationcycle;
+        }
+
+        public long GetSimulationTime()
+        {
+            return computationtime;
         }
 
         public void FinishSimulate()
@@ -339,6 +359,7 @@ namespace SimulatorBalancerLibrary
         public double[] Parametervalues { get; set; }
         public double Ssq { get; set; }
         public long timepercycle { get; set; }
+        public long simulationtime { get; set; }
         public long countpercycle { get; set; }
         public int workerspercycle { get; set; }
 

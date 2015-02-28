@@ -257,6 +257,7 @@
                                   
                                   $('#messages').append('<li> Final result: ' + identifyDTO.Parametervalues+'</li>');
                                   $('#messages').append('<li> Elapsed time: ' + identifyDTO.elapsedtime + '</li>');
+                                  $('#messages').append('<li> Simulation time: ' + identifyDTO.simulationtime + '</li>');
                                   //remove first <li> if the number of messages is too long.
                                   //console.log("number of li " + $('#messages li').length);
                                   if ($('#messages li').length > 10) $('#messages li:first').remove();
@@ -320,7 +321,7 @@
                                       if (y > 0) {
                                           estimatedTime = ([computationParams[0] * computationParams[1]] - identifyDTO.countcycles) / y;
                                           fulltime = ([computationParams[0] * computationParams[1]]) / y;
-                                          $('#messages').append('<li>'+ identifyDTO.countcycles + ' simulací. Čas do konce ' + estimatedTime + 's. Čas výpočtu '+fulltime + 's</li>');
+                                          $('#messages').append('<li>' + identifyDTO.countcycles + ' simulací.  simulation:' +identifyDTO.elapsedtime+ ' ms. simulace:' + identifyDTO.simulationtime + ' ms. Čas do konce ' + estimatedTime + 's. Čas výpočtu ' + fulltime + 's</li>');
                                       }
                                   }
                                   //public long countpercycle { get; set; }public int workerspercycle)
@@ -523,6 +524,7 @@
                                       $('#resultDescription').append('<li> ssq:' + identifyDTO.ssq + '</li>');
                                       $('#resultDescription').append('<li> computation cycles:' + identifyDTO.countcycles + '</li>');
                                       $('#resultDescription').append('<li> computation time:' + identifyDTO.elapsedtime + '</li>');
+                                      $('#resultDescription').append('<li> simulation time:' + identifyDTO.simulationtime + '</li>');
                                   });
                                   //update resultTable
                                   //update resultGraph

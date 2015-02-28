@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace SimulatorBalancerLibrary
 {
@@ -29,9 +31,15 @@ namespace SimulatorBalancerLibrary
             return result;
         }
 
+        private static Stopwatch sw = new Stopwatch();
+//        private static long simulationtime =0;
+
         private static double MySincFunction(double[] timepoints, int i, double[] t)
         {            
-            return t[2]*Sinc(t[0]*(timepoints[i] - t[1])) + t[3]*timepoints[i];
+            sw.Start();
+            var result = t[2]*Sinc(t[0]*(timepoints[i] - t[1])) + t[3]*timepoints[i];
+            sw.Stop();
+            return result;
         }
 
         public  double[][] Simulate(string wurl, string[] parameternames, double[] parametervalues, string[] variablenamesinresult, double[] timepoints)
@@ -66,6 +74,13 @@ namespace SimulatorBalancerLibrary
             var mycc = computationcycles;
             computationcycles = 0;
             return mycc;// throw new NotImplementedException();
+        }
+
+        public long GetSimulationTime()
+        {
+            var myst = sw.ElapsedMilliseconds;
+            sw.Reset();
+            return myst;
         }
 
         public void FinishSimulate()

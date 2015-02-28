@@ -1,6 +1,7 @@
 function identify_loaddll(model_name,update_url)
 %currentfolderdll = strcat(pwd,'\SimulatorBalancerLibrary.dll')
 %identify_logs('current directory:',pwd);
+identify_logs('update_url',update_url);
 currentfolderdll = 'c:\inetpub\wwwroot\identifikace\bin\SimulatorBalancerLibrary.dll';
 %disp(currentfolderdll);
 NET.addAssembly(currentfolderdll);

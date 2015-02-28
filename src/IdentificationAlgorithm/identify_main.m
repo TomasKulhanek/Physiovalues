@@ -1,5 +1,4 @@
-function p_fitted = identify_main(experiment,p_names,p_val,p_min,p_max,p_is_fixed,variable_names,model_name,update_url)
-    
+function p_fitted = identify_main(experiment,p_names,p_val,p_min,p_max,p_is_fixed,variable_names,model_name,update_url)   
             % debugging
             %diary('c:\Users\tomaton\Documents\KOFRLAB-simenv\VersionedProjects\RestMasterService\matlab.log');           
             %vectorized = 'on';
@@ -53,6 +52,8 @@ dirname = 'c:\Users\tomaton\Documents\KOFRLAB-simenv\VersionedProjects\';
  dlmwrite(strcat(dirname,'variable_names.mat'),variable_names);
  dlmwrite(strcat(dirname,'model_name.mat'),model_name);
  dlmwrite(strcat(dirname,'update_url.mat'),update_url);
+ global filename
+ filename = strcat(dirname,'matlab.log');
     [p_fitted, val] = identify_minimize( experiment, p_names,p_min,p_max, ...
         p_val, p_is_fixed,variable_names);
     global result_ssq
