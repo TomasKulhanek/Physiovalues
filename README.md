@@ -1,16 +1,29 @@
-Physiovalues
-============
+### Physiovalues
 
-Project of application to compute, store and provide values of parameters of physiological models via lightweight API. 
+Project of web application to compute, store and provide values of parameters of physiological models via lightweight API.
 
-## Phase 1
+### Applications
+* (app.physiovalues.org)[http://app.physiovalues.org] - Special application for parameter estimation of selected models. 
+* (sim.physiovalues.org)[http://sim.physiovalues.org] - Web-based simulators and simulator editor of selected models.
+* (physiome@home)[http://physiome.lf1.cuni.cz/ident3] - BOINC Application for parameter sweep.
 
-The project evolves from research and development of system to calibrate Modelica models.
+### Code base
 
+* For technology and source code development see https://github.com/TomasKulhanek/Physiovalues
+* Exemplar models source code in Modelica see https://github.com/TomasKulhanek/Physiolibrary.models
 
-## Development and contribution
+### Related projects
 
-Project manager: [Tomas Kulhanek] (https://github.com/TomasKulhanek)
+* (www.physiolibrary.org)[http://www.physiolibrary.org] - Modelica library for modeling physiology
+* (Chemicals)[https://github.com/MarekMatejak/Chemicals] - Modelica library for modeling chemical reactions
+* (www.physiome.cz/atlas)[http://www.physiome.cz/atlas] - Simulators and educational material, atlas of physiology and pathophysiology
 
-Contributors: [Marek Matejak] (https://github.com/MarekMatejak) - test Modelica models, libraries, [Jan Silar] - identification algorithm
+### Documents
+* Tomáš Kulhánek, Utilization of GRID technology in processing of medical information, Dissertation, [doc/summary.pdf], [doc/thesis.pdf]
+* 
+
+### Development and Contributor
+* (Tomáš Kulhánek)[https://github.com/TomasKulhanek]
+* (Marek Mateják)[https://github.com/MarekMatejak]
+
 
