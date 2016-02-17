@@ -2,10 +2,11 @@
 using System.Data;
 using System.Linq;
 using RestMasterService.WebApp;
+using ServiceStack;
 using ServiceStack.Common;
 using ServiceStack.OrmLite;
-using ServiceStack.ServiceHost;
-using ServiceStack.ServiceInterface;
+//using ServiceStack.ServiceHost;
+//using ServiceStack.ServiceInterface;
 
 
 namespace RestMasterService.ComputationNodes

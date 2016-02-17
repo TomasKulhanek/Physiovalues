@@ -28,6 +28,6 @@ global mySimulator;
 try
 xymat = mySimulator.Simulate(p_names,p,variable_names,grid);
 catch e
-    identify_logs('.net simulate exception',e.message+e.StackTrace);
-    throw(e);
+    identify_logs('.net simulate exception',getReport(e));
+    rethrow(e);
 end

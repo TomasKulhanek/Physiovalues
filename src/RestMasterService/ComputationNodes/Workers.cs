@@ -8,12 +8,14 @@ using PostSharp.Patterns.Diagnostics;
 using RestMasterService.WebApp;
 using ServiceStack.Configuration;
 using ServiceStack.Common;
-using ServiceStack.ServiceHost;
-using ServiceStack.ServiceInterface;
-using ServiceStack.ServiceInterface.Auth;
-using ServiceStack.ServiceInterface.ServiceModel;
-using ServiceStack.WebHost.Endpoints;
+//using ServiceStack.ServiceHost;
+//using ServiceStack.ServiceInterface;
+//using ServiceStack.ServiceInterface.Auth;
+//using ServiceStack.ServiceInterface.ServiceModel;
+//using ServiceStack.WebHost.Endpoints;
 using PostSharp.Extensibility;
+using ServiceStack;
+
 //using PostSharp.Extensibility;
 //using PostSharp.Patterns.Diagnostics;
 

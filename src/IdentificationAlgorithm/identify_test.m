@@ -14,6 +14,9 @@ ssq = identify_getssq();
 ssq
 cycles = identify_getcomputationcycles();
 cycles
+simtime = identify_getsimulationtime();
+simtime
+
 
 %             %vectorized = 'on';
 %             M = load ('data/mySinc.txt');

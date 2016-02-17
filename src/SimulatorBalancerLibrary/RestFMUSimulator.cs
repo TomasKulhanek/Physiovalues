@@ -4,13 +4,15 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using NLog;
 using RestMasterService.ComputationNodes;
-using ServiceStack.ServiceClient.Web;
-using ServiceStack.ServiceHost;
+//using ServiceStack.ServiceClient.Web;
+//using ServiceStack.ServiceHost;
 //
 //using System;
 using System.Linq;
 using PostSharp.Patterns.Diagnostics;
 using PostSharp.Extensibility;
+using ServiceStack;
+
 //using PostSharp.Patterns.Diagnostics;
 //using PostSharp.Extensibility;
 /*using System.Configuration;

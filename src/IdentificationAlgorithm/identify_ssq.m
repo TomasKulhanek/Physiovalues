@@ -19,18 +19,21 @@ function L2E = identify_ssq(net_model_data)
         %identify_logd('experiment-times',experiment_times);
         %identify_logd('model_times',model_times);
         if norm(experiment_times - model_times, inf) > 1e-12
-            error('experiment and model times are not the same');
-        end
+            %error('experiment and model times are not the same');
+            identify_logs('error in ssq.experiment and model times are not the same');
+            L2E= 1e+10;
+        else
 %        for i_sample = 1:n_samles
     %evaluate the error:
     % bug - exact data with more variables has different dimension
         L2E(i_individual) = ...
             norm(exact_data - model_data(:,2:end,i_individual),'fro');
-            
+        
 %            d = abs((y_e(min_ind:max_ind) - y_m_interp).*dx_e_trimed);
+        end
     end
     catch err
-        identify_logs('exception in ssq',err.message+err.stacktrace);%,net_model_data);
+        identify_logs('exception in ssq',getReport(err));%,net_model_data);
         %rethrow(err);
         L2E= 1e+10;
     end

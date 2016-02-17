@@ -11,11 +11,11 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using NLog;
 using RestMasterService.ComputationNodes;
-using ServiceStack.Common.Net30;
+//using ServiceStack.Common.Net30;
 //using ServiceStack.Net30.Collections.Concurrent;
-using ServiceStack.Redis.Support;
-using ServiceStack.ServiceHost;
-using ServiceStack.WebHost.Endpoints;
+//using ServiceStack.Redis.Support;
+//using ServiceStack.ServiceHost;
+//using ServiceStack.WebHost.Endpoints;
 using IdentificationAlgorithm;
 using System.Diagnostics;
 using SimulatorBalancerLibrary;
@@ -23,6 +23,8 @@ using IdentifyDTO = RestMasterService.ComputationNodes.IdentifyDTO;
 using Worker = RestMasterService.ComputationNodes.Worker;
 using PostSharp.Patterns.Diagnostics;
 using PostSharp.Extensibility;
+using ServiceStack;
+using ServiceStack.Api.Swagger.Support;
 
 //using PostSharp.Extensibility;
 
@@ -48,8 +50,8 @@ namespace RestMasterService.WebApp
         private double IApopulationsize = 0;
         private double IAtolfun = 0;
         //TODO self detection
-        string masterserviceurl = "http://localhost/identifikace/";
-        //string masterserviceurl = "http://localhost:51382/";
+        //string masterserviceurl = "http://localhost/identifikace3/";
+        string masterserviceurl = "http://localhost:51382/";
         Random random = new Random();
         Logger logger = LogManager.GetLogger("MyClassName");
         //private readonly ConcurrentDictionary<string, Stock> _stocks = new ConcurrentDictionary<string, Stock>();
@@ -60,7 +62,7 @@ namespace RestMasterService.WebApp
             Clients = clients;
             //adds defaoult worker
             //TODO add it here ?
-            var myrepository = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<WorkersRepository>();
+            var myrepository = HostContext.Container.Resolve<WorkersRepository>();
             var w = new Worker{ModelName = "mysinc",RestUrl = "mysinc",WorkerType="test"};
             myrepository.Store(w);
         }
@@ -151,13 +153,15 @@ namespace RestMasterService.WebApp
             try
             {
                 BroadcastIdentifyStateMessage("Starting calculation ..." + DateTime.Now);
+                logger.Log(NLog.LogLevel.Info, "starting calculation ");
                 //invoke matlab Identification algorithm - does it use the GenericSimulator instance configured before???
                 Class1 class1 = new Class1();
+                logger.Log(NLog.LogLevel.Debug, "class1 init");
                 //set experiment variables and values
-                MWArray v_names = new MWCellArray(new MWCharArray(variable_names.ToArray()));
+                MWArray v_names = new MWCellArray(new MWCharArray(Enumerable.ToArray(variable_names)));
                 MWArray experiment = new MWNumericArray(variable_values);
                 //set identification parameters
-                MWArray p_names = new MWCellArray(new MWCharArray(parameters.Keys.ToArray()));
+                MWArray p_names = new MWCellArray(new MWCharArray(Enumerable.ToArray(parameters.Keys)));
                 //set worker nodes urls
                 //var host = AppHostBase.Instance.Config.ServiceEndpointsMetadataConfig.DefaultMetadataUri;
                 //var myrepository = ((AppHostBase) EndpointHost.AppHost).Container.Resolve<WorkersRepository>();
@@ -177,7 +181,9 @@ namespace RestMasterService.WebApp
                     MWArray tolfun = new MWNumericArray(IAtolfun);
                     class1.identify_gaoptimset(generations, populationsize, tolfun);
                 } //otherwise the matlab algorithm has it's own default values
-                var result = class1.identify_main(experiment, p_names, p_val, p_min, p_max, p_is_fixed, v_names,modelname,masterserviceurl);
+                logger.Log(NLog.LogLevel.Debug, "mwarray init");
+                var result = class1.identify_main(experiment, p_names, p_val, p_min, p_max, p_is_fixed, v_names, modelname, masterserviceurl);
+                logger.Log(NLog.LogLevel.Debug, "identify_main done");
                 sw.Stop();
                 
                 /*var fitted_params = result[1];
@@ -197,6 +203,12 @@ namespace RestMasterService.WebApp
                 //TODO handle matlab exception
                 BroadcastIdentifyStateMessage(e.Message+e.StackTrace);
                 logger.Log(NLog.LogLevel.Error,"exception during identification "+e.Message+" stacktrace:"+e.StackTrace,e);
+                var f = e;//.InnerException;
+                while (f.InnerException != null)
+                {
+                    f = f.InnerException;
+                    logger.Log(NLog.LogLevel.Error, "innerexception:" + f.Message + " stacktrace:" + f.StackTrace, f);
+                }
             }
 //            StopIdentify();
             FinalizeIdentify();
@@ -219,7 +231,7 @@ namespace RestMasterService.WebApp
             //var myssq = ((MWIndexArray) o).
             //TODO should it be implemented in MATLAB class instead of directly in here?
             //get workers url
-            var myrepository = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<WorkersRepository>();
+            var myrepository = HostContext.Container.Resolve<WorkersRepository>();
             //var workers = (List<Worker>) myrepository.GetByModelName(identify.model);
             var workers = (List<Worker>)myrepository.GetByModelName(modelname);
             //compute on the first worker (expected that first worker is in localhost)
@@ -236,15 +248,15 @@ namespace RestMasterService.WebApp
                                       elapsedtime = elapsed.ToString()+" simulation: "+simulationtime.GetValue(0,0).ToString(),
                                       name= "Result of "+modelname+" at "+DateTime.Now,
                                       model = modelname,
-                                      Parameternames = parameters.Keys.ToArray(),
+                                      Parameternames = Enumerable.ToArray(parameters.Keys),
                                       Parametervalues = myresult.ToArray(), 
-                                      ParameterAssignment = parameters.Values.ToArray(),
+                                      ParameterAssignment = Enumerable.ToArray(parameters.Values),
                                       Variablenames = variable_names,
-                                      Variablevalues = simulator.Simulate(workers.Select(w => w.RestUrl).First(),parameters.Keys.ToArray(),myresult.ToArray(),variable_names.ToArray(),timepoints.ToArray()), //expected that in variable-values[0] is timepoints
+                                      Variablevalues = simulator.Simulate(workers.Select(w => w.RestUrl).First(),Enumerable.ToArray(parameters.Keys),myresult.ToArray(),Enumerable.ToArray(variable_names),timepoints.ToArray()), //expected that in variable-values[0] is timepoints
                                       Experimentalvalues = variable_values
                                   };
             //Clients.All.closeIdentifyProcess(responseDto);
-            var repositoryResult = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<ResultRepository>();
+            var repositoryResult = HostContext.Container.Resolve<ResultRepository>();
             repositoryResult.Store(responseDto);
             Clients.All.closeIdentifyProcessandResultUpdate(responseDto,repositoryResult.GetAllResultsMeta());
         }
@@ -279,7 +291,7 @@ namespace RestMasterService.WebApp
                 {
                     _updatingIdentifyState = true;
                     
-                    Clients.All.currentParams(parameters.Values.ToArray()); //calls method on clients - Javascript, or .NET
+                    Clients.All.currentParams(Enumerable.ToArray(parameters.Values)); //calls method on clients - Javascript, or .NET
                 }
                 _updatingIdentifyState = false;
             }

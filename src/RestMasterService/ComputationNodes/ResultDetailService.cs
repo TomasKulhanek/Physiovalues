@@ -1,7 +1,8 @@
 using System;
 using System.Linq;
-using ServiceStack.ServiceHost;
-using ServiceStack.ServiceInterface;
+using ServiceStack;
+//using ServiceStack.ServiceHost;
+//using ServiceStack.ServiceInterface;
 
 namespace RestMasterService.ComputationNodes
 {

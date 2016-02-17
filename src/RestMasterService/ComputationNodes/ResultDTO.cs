@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using RestMasterService.WebApp;
-using ServiceStack.Common.Extensions;
+using ServiceStack;
+//using ServiceStack.Common.Extensions;
 using ServiceStack.OrmLite;
-using ServiceStack.Redis.Support;
-using ServiceStack.ServiceHost;
-using ServiceStack.ServiceInterface;
+//using ServiceStack.Redis.Support;
+//using ServiceStack.ServiceHost;
+//using ServiceStack.ServiceInterface;
 
 namespace RestMasterService.ComputationNodes
 {
@@ -114,11 +115,12 @@ namespace RestMasterService.ComputationNodes
             }
 
         }
+        
         public void DeleteFromDB(params long[] Ids)
         {
             using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
-                db.DeleteByIdParam<ResultDTO>(Ids);
+                db.DeleteById<ResultDTO>(Ids);
             }
 
         }

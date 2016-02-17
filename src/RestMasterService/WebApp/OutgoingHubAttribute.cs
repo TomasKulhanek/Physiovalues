@@ -1,8 +1,15 @@
 using System;
 using Microsoft.AspNet.SignalR;
 using RestMasterService.ComputationNodes;
-using ServiceStack.ServiceHost;
-using ServiceStack.WebHost.Endpoints;
+using ServiceStack;
+using ServiceStack.Web;
+using IRequest = ServiceStack.Web.IRequest;
+
+//using IRequest = Microsoft.AspNet.SignalR.IRequest;
+
+//using ServiceStack.ServiceHost;
+//using ServiceStack.Web;
+//using ServiceStack.WebHost.Endpoints;
 
 namespace RestMasterService.WebApp
 {
@@ -10,7 +17,8 @@ namespace RestMasterService.WebApp
     public class OutgoingHubAttribute : Attribute, IHasResponseFilter
     {
 
-        public void ResponseFilter(IHttpRequest req, IHttpResponse res, object responseDto)
+        
+  /*      public void ResponseFilter(IRequest req, IResponse res, object responseDto)
         {
             //TODO avoid memory leaks
             var hub = GlobalHost.ConnectionManager.GetHubContext<IdentifyStateHub>();
@@ -19,10 +27,27 @@ namespace RestMasterService.WebApp
                 
                 if ((responseDto==null) || (responseDto.GetType()==typeof(Worker)))
                 {
-                    var myrepository = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<WorkersRepository>();
+                    var myrepository = HostContext.Container.Resolve<WorkersRepository>();
                     hub.Clients.All.updateModels(myrepository.GetModelNames());
                 }                
                 else if (responseDto.GetType()==typeof(IdentifyDTO)) hub.Clients.All.updateIdentifyProcess(responseDto);
+            }
+        }*/
+
+        public void ResponseFilter(IRequest req, IResponse res, object response)
+        {
+
+            //TODO avoid memory leaks
+            var hub = GlobalHost.ConnectionManager.GetHubContext<IdentifyStateHub>();
+            if (hub != null)
+            {
+
+                if ((response == null) || (response.GetType() == typeof(Worker)))
+                {
+                    var myrepository = HostContext.Container.Resolve<WorkersRepository>();
+                    hub.Clients.All.updateModels(myrepository.GetModelNames());
+                }
+                else if (response.GetType() == typeof(IdentifyDTO)) hub.Clients.All.updateIdentifyProcess(response);
             }
         }
 

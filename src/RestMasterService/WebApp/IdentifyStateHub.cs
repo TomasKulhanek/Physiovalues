@@ -10,13 +10,14 @@ using System.Linq;
 using System.Configuration;
 using System.Collections.Generic;
 using RestMasterService.WebApp;
+using ServiceStack;
 using ServiceStack.Configuration;
 using ServiceStack.Common;
-using ServiceStack.ServiceHost;
-using ServiceStack.ServiceInterface;
-using ServiceStack.ServiceInterface.Auth;
-using ServiceStack.ServiceInterface.ServiceModel;
-using ServiceStack.WebHost.Endpoints;
+//using ServiceStack.ServiceHost;
+//using ServiceStack.ServiceInterface;
+//using ServiceStack.ServiceInterface.Auth;
+//using ServiceStack.ServiceInterface.ServiceModel;
+//using ServiceStack.WebHost.Endpoints;
 
 namespace RestMasterService.WebApp
 {
@@ -35,8 +36,8 @@ namespace RestMasterService.WebApp
 
         public override Task OnConnected()
         {
-                var myrepository = ((AppHostBase) EndpointHost.AppHost).Container.Resolve<WorkersRepository>();
-                var resultsRepository = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<ResultRepository>();
+                var myrepository = HostContext.Container.Resolve<WorkersRepository>();
+                var resultsRepository = HostContext.Container.Resolve<ResultRepository>();
 
 
             Clients.Client(Context.ConnectionId).updateModelsResults(myrepository.GetModelNames(),resultsRepository.GetAllResultsMeta());
@@ -54,6 +55,7 @@ namespace RestMasterService.WebApp
             Clients.All.currentParams(parameters);
         }
 
+        //[Authorize]
         public void StartIdentify(string[][] initialparameters, string [] variablenames, double[][] experiment_data,string modelName,double[] computationParams)
         {
             _identStateTicker.SetUri(Context.Request.Url.Port);
@@ -65,12 +67,14 @@ namespace RestMasterService.WebApp
             _identStateTicker.StartIdentify();
         }
 
+        //[Authorize]
         public void StartIdentifyObjects(IdentifyParameters[] initialparameters)
         {
             _identStateTicker.SetParameters(initialparameters);
             _identStateTicker.StartIdentify();
         }
 
+        //[Authorize]
         public void StopIdentify()
         {
             _identStateTicker.StopIdentify();
@@ -90,7 +94,7 @@ namespace RestMasterService.WebApp
             }
             Clients.All.updateCountCycles(identify.countcycles);*/
             //_identStateTicker.BroadcastIdentifyStateMessage();
-            var myrepository = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<WorkersRepository>();
+            var myrepository = HostContext.Container.Resolve<WorkersRepository>();
             //var workers = (List<Worker>) myrepository.GetByModelName(identify.model);//TODO move from singleton computation to multiple computation
             var workers = (List<Worker>)myrepository.GetByModelName(_identStateTicker.GetModelToIdentify());
             return workers.Select(x => x.RestUrl).ToArray();

@@ -5,6 +5,7 @@
     <title>Identifikace: HTML5 preview</title>
     <!-- dygraphs, interactive graphs http://dygraphs.com/ --->
     <script type="text/javascript" src="../Scripts/dygraph-combined.js"></script>
+    <script type="text/javascript" src="https://ds.eduid.cz/ds.js"></script>    
     
     <!-- excel like tables, http://handsontable.com/ -->
     <script src="../Scripts/jquery-1.9.1.min.js"></script>
@@ -34,6 +35,7 @@
         #currentRow {background-color: lightblue}
         #currentCol {background-color: lightblue}
         #loginText {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
+        #loginText2 {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
         #uName {float: right;font-size: 80%;padding-top: 2px;}
         #buttons { float: left;}
         #messages { font-size: 80%;}
@@ -44,9 +46,10 @@
     </style>
 </head>
     <body>
-              <div id="wrapper">                  
-                 <a href='#' onClick="login();" id="loginText"> Login via Google Account </a><a href="#" style="display:none" id="loginText" target='myIFrame' onclick="myIFrame.location='https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a><iframe name='myIFrame' id="Iframe1" style='display:none'></iframe>
-                 <b id='uName'> Not logged in.&nbsp;</b> 
+              <div id="wrapper">
+              <a id="loginText2" href="/Shibboleth.sso/Login" onclick="startOverlay(event)">Login via EDUID.CZ</a><iframe name='myIFrame' id="Iframe2" style='display: none'></iframe>
+              <a href='#' onClick="login();" id="loginText"> Login via Google Account </a><a href="#" style="display: none" id="loginText" target='myIFrame' onclick="myIFrame.location = 'https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a><iframe name='myIFrame' id="Iframe1" style='display: none'></iframe>
+              <b id='uName'> Not logged in.&nbsp;</b> 
               <div id="tabContainer">
                   <div id="tabs">
                       <ul>
