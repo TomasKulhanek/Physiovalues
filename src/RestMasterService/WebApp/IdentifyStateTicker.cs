@@ -27,7 +27,7 @@ using ServiceStack;
 using ServiceStack.Api.Swagger.Support;
 
 //using PostSharp.Extensibility;
-
+[assembly: NOJVM(true), LOGFILE("matlablog.txt")]
 namespace RestMasterService.WebApp
 {
     public class IdentifyStateTicker
@@ -57,7 +57,7 @@ namespace RestMasterService.WebApp
         //private readonly ConcurrentDictionary<string, Stock> _stocks = new ConcurrentDictionary<string, Stock>();
         //constructor
 
-        private IdentifyStateTicker(IHubConnectionContext clients)
+        private IdentifyStateTicker(IHubConnectionContext<dynamic> clients)
         {
             Clients = clients;
             //adds defaoult worker
@@ -77,7 +77,7 @@ namespace RestMasterService.WebApp
             }
         }
 
-        private IHubConnectionContext Clients
+        private IHubConnectionContext<dynamic> Clients
         {
             get;
             set;

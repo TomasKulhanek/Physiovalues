@@ -1,4 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.postsharp.org/1.0/configuration">
-  <Using File="..\RestMasterService\packages\PostSharp.Patterns.Diagnostics.3.0.37\tools\PostSharp.Patterns.Diagnostics.Weaver.dll" />
+  <Using File="..\..\src\packages\PostSharp.Patterns.Diagnostics.4.2.21\tools\PostSharp.Patterns.Diagnostics.Weaver.dll" />
 </Project>
