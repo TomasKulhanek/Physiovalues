@@ -1,0 +1,99 @@
+echo setting variables
+#boincserverconfig=~/.boinc_test.conf
+# name of the MySQL database
+dbname=physiome
+# name of the MySQL user with access to above database
+dbuser=boincadm
+# password for write access to your project database
+dbpasswd=boinc
+# address of host (via DNS or IP number) at which project server shall be reached
+hosturl=http://physiome.lf1.cuni.cz/ident3
+# name of folder in which data shall be stored, also becomes part of project URL
+projectname=physiome
+# more human-compatible way to read the project name
+projectnicename="Physiome@home"
+# location to store the project files, a projectname subdirectory will be created
+installroot=/var/lib/boinc-server-test
+echo creating mysql, may need mysql password, default empty
+# create mysql
+if   [ -z "$dbuser" ]; then echo "Variable 'dbuser' not set";
+elif ! echo "DROP USER '$dbuser'@'localhost'" | mysql -u root -p; then
+   echo "If the removal of the previous user fails because the user is not existing, then this does not matter. Other errors please investigate."
+fi
+
+#create mysql tables
+if   [ -z "$dbname" ]; then echo "Variable 'dbname' not set";
+elif [ -z "$dbpasswd" ]; then echo "Variable 'dbpasswd' not set";
+else
+   # piping commands to mysql shell
+   EOMYSQL="DROP DATABASE IF EXISTS $dbname; \
+CREATE USER '$dbuser'@'localhost' IDENTIFIED BY '$dbpasswd';\
+GRANT ALL PRIVILEGES ON $dbname.* TO '$dbuser'@'localhost';"
+   echo $EOMYSQL | mysql -u root -p;
+#EOMYSQL
+fi
+# test configuration
+echo test configuration
+echo -n "Basic configuration test: "
+  if [ -z "$installroot" -o -z "$hosturl" -o -z "$dbname" -o -z "$dbpasswd" \
+    -o -z "$projectnicename" -o -z "$projectname" ] ; then
+     echo "Missing configuration parameter."
+  else
+     echo "[ok]"
+  fi
+
+#create project
+sudo PYTHONPATH=$PYTHONPATH:/usr/share/python-support/boinc-server/Boinc/ /usr/share/boinc-server/tools/make_project --url_base "$hosturl" --db_name "$dbname" --db_user "$dbuser" --db_passwd "$dbpasswd" --delete_prev_inst --drop_db_first --project_root "$installroot"/"$projectname" --srcdir /usr/share/boinc-server/ "$projectname" "$projectnicename"
+
+echo adjusting permission to project directory ...
+if [ -z "$installroot" -o -z "$projectname" ]; then
+  echo "Not all variables are set for the configuration"
+  echo "Error, do not continue."
+elif [ ! -d "$installroot"/"$projectname" ]; then
+  echo "The directory '$installroot/'$projectname' is not existing"
+  echo "Error, do not continue."
+else
+  cd "$installroot"/"$projectname"
+  sudo chown boincadm:boincadm  -R .
+  sudo chmod g+w -R .
+  sudo chmod 02770 -R upload html/cache html/inc html/languages html/languages/compiled html/user_profile
+  hostname=`hostname`
+  if [ -z "$hostname" ]; then 
+    echo "Please specify the hostname"
+  else
+    sudo chgrp -R www-data log_"$hostname" upload
+  fi
+fi
+
+echo accessible include files ...
+if [ -d html/inc -a -d cgi-bin ]; then
+  echo -n "html/inc: "; sudo chmod o+x html/inc && sudo chmod -R o+r html/inc && echo "[ok]" || echo "[failed]"
+  echo -n "html/languages: "; sudo chmod o+x html/languages/ html/languages/compiled && echo "[ok]" || echo "[failed]"
+else
+  echo "You are not in your project directory"
+fi
+
+sudo a2enmod cgi
+sudo a2enmod php5
+sudo /etc/init.d/apache2 restart
+
+echo create forums.php ...
+if [ ! -r create_forums.php ]; then
+    if [ -r html/ops/create_forums.php ]; then 
+        cd html/ops
+    elif [ -r  $installroot/$fileprojectname/html/ops/create_forums.php ]; then
+        cd $installroot/$fileprojectname/html/ops
+    else
+        echo "Could not find create_forums.php"
+    fi
+fi
+
+sudo sed -i '/remove the die/d' create_forums.php
+php5 create_forums.php
+
+echo config apache, sudo may need root passwd
+cd "$installroot"/"$projectname"
+sudo htpasswd -c html/ops/.htpasswd USERNAME
+sudo cp ${projectname}.httpd.conf  /etc/apache2/sites-available/ \
+&& sudo a2ensite  ${projectname}.httpd.conf \
+&& sudo /etc/init.d/apache2 reload

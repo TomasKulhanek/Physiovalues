@@ -1,0 +1,13 @@
+<job_desc>
+    <task>
+        <application>physiome</application>
+        <command_line/>
+        <append_cmdline_args/>
+        <time_limit>36000</time_limit>
+        <fraction_done_filename>progress.txt</fraction_done_filename>
+    </task>
+    <zip_output>
+       <zipfilename>atrialpv.zip</zipfilename>
+       <filename>atrialpv.json</filename>
+    </zip_output>
+</job_desc>

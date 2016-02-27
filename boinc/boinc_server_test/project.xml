@@ -1,0 +1,10 @@
+<boinc>
+    <platform>
+        <name>windows_intelx86</name>
+        <user_friendly_name>Microsoft Windows (98 or later) running on an Intel x86-compatible CPU</user_friendly_name>
+    </platform>
+    <app>
+        <name>physiome1</name>
+        <user_friendly_name>Physiome -- Sensitivity Analysis of models of human physiology</user_friendly_name>
+    </app>
+</boinc>
