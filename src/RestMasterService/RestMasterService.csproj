@@ -214,7 +214,6 @@
     <Content Include="Scripts\mygoogleauth.js" />
     <Content Include="WebApp\GenericUI.html" />
     <Content Include="WebApp\GenericUIen.html" />
-    <Content Include="WebApp\FakeIdentify.html" />
     <Content Include="Scripts\addclasskillclass.js" />
     <Content Include="Scripts\AddCSS.js" />
     <Content Include="Scripts\attachevent.js" />
@@ -268,7 +267,9 @@
     <Compile Include="Shibboleth\ShibbolethAuthProvider.cs" />
     <Compile Include="Shibboleth\ShibbolethController.cs" />
     <Compile Include="WebApp\AppStart.cs" />
-    <Compile Include="WebApp\IClient.cs" />
+    <Compile Include="WebApp\ExternalDoc.cs" />
+    <Compile Include="WebApp\Graphic.cs" />
+    <Compile Include="WebApp\GraphicMetaService.cs" />
     <Compile Include="WebApp\IdentifyParameters.cs" />
     <Compile Include="WebApp\IdentifyRepository.cs" />
     <Compile Include="WebApp\IdentifyStateHub.cs" />
@@ -284,8 +285,11 @@
     <Compile Include="Site.Master.designer.cs">
       <DependentUpon>Site.Master</DependentUpon>
     </Compile>
+    <Compile Include="WebApp\Models.cs" />
     <Compile Include="WebApp\OutgoingHubAttribute.cs" />
     <Compile Include="Shibboleth\ShibbolethPrincipal.cs" />
+    <Compile Include="WebApp\SimAppScreenMetasService.cs" />
+    <Compile Include="WebApp\SimAppScreenService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

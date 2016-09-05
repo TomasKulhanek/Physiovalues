@@ -38,7 +38,7 @@ namespace RestMasterService.WebApp
         {
 
             //TODO avoid memory leaks
-            var hub = GlobalHost.ConnectionManager.GetHubContext<IdentifyStateHub>();
+            var hub = GlobalHost.ConnectionManager.GetHubContext<dynamic>();
             if (hub != null)
             {
 

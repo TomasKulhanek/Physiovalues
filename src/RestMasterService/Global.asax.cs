@@ -49,6 +49,15 @@ namespace RestMasterService
                 container.Register(new WorkersRepository());
                 container.Register(new IdentifyRepository());
                 container.Register(new ResultRepository());
+                container.Register(new SimAppScreenRepository());
+
+                //TODO test - is it ok to upload from DB here - or from instance creation
+                var myrepository = container.Resolve<SimAppScreenRepository>();
+                myrepository.UploadFromDB();
+
+                container.Register(new GraphicRepository());
+                var mygrrepository = container.Resolve<GraphicRepository>();
+                mygrrepository.UploadFromDB();
 
                 SetConfig(new HostConfig { DefaultRedirectPath = "/WebApp/GenericUI.html" });
                 //Set once before use (i.e. in a static constructor).

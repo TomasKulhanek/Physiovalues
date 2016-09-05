@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Simulation Browser</title>        
+        <script src="../Scripts/jquery-1.11.0.min.js" type="text/javascript"></script>
+        <script type="text/javascript" src="../Scripts/codemirror.js"></script>    
+        <script type="text/javascript" src="../Scripts/xml.js"></script>    
+        <link rel=stylesheet href="../Scripts/codemirror.css"/>
+        <!--<link href="../Scripts/javascript-tabs.css" rel="stylesheet" type="text/css" /-->
+        
+        <link href="../Scripts/jquery-ui-1.10.3.custom.css" rel="stylesheet" type="text/css" />
+        <link href="../Scripts/SimAppParser.css" rel="stylesheet" type="text/css" />
+        <!--link href="../Scripts/jquery-ui.css" rel="stylesheet" type="text/css" /-->
+        <script src="../Scripts/jquery-ui-1.10.3.custom.js" type="text/javascript"></script>
+        <script src="../Scripts/GraphicsInteraction.js" type="text/javascript"></script>
+        <script src="../Scripts/SimAppInteraction.js" type="text/javascript"></script>
+        <script src="../Scripts/createjs/easeljs-0.6.0.min.js" type="text/javascript"></script>
+        <script src="../Scripts/createjs/tweenjs-0.4.0.min.js" type="text/javascript"></script>
+        <script src="../Scripts/createjs/movieclip-0.6.0.min.js" type="text/javascript"></script>
+        <script src="../Scripts/createjs/preloadjs-0.3.0.min.js" type="text/javascript"></script>
+        <!--script src="../Scripts/createjs/loadflashjs.js" type="text/javascript"></script-->
+        <!--script src="../Scripts/srdce_real_hybajici2.js" type="text/javascript"></script-->
+
+        <style>
+            body {
+                font: 75% sans-serif;
+            }
+            #footer {
+                font: 80% sans-serif;
+                text-align: center;
+            }
+            /* .ui-menu { width: 150px; }*/
+        </style>
+    </head>
+    <body>
+        <div id="appmenudiv"></div>
+        <div id="tabs" >
+            <ul>
+                <li><a href="#tab0">Select graphic element</a></li>
+                <li><a href="#tab1">Graphic editor</a></li>                    
+            </ul>
+            <div id="tab0">
+                 <select size="10" name="selectionField" id="models" onchange="getSelectedItem(this)"> 
+        <option value="test" >test</option>  
+    </select>
+                <script>
+
+                    initializeGraphicMenu();
+                    
+                    function getSelectedItem(item) {
+                        loadGraphic(item.options[item.selectedIndex].value);
+                        //getSelectedItemByModelName(item.options[item.selectedIndex].value);                        
+                    }
+                                        
+                </script>
+            </div>
+            <div id="tab1">                           
+                This editor is for defining simulation application in the first tab. Syntax is still in development.
+                <div id="container5">
+                    <div id="container4">
+                        <div id="col4">
+                            <textarea id="code" name="code">                
+                </textarea>
+                        <p>preview:</p>
+                            <div id="graphic"><canvas id="graphiccanvas" width="550" height="400" style="background-color:#e1ffff"></canvas></div>   
+                        </div>
+                        <div id="col5">                            
+                            <b>Graphic element definition.</b> Write graphic element in the following supported formats:
+                            <ul>
+                                <li><b>&lt;svg id="name.svg" ...&gt;</b> - in first row of root element define attribute id="somename" the graphic element will be registered with this "somename" name.</li>
+                                <li><b>//javascript id="name.js" </b> - in first row add comment in javascript with id="name.js", the JS will be registered with this name.</li>
+                            </ul>
+                            
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    <button id="savesimapp">Save graphic element definition</button><button id="deletesimapp" style="float:right">Delete</button>
+                </p>
+               
+                <script>
+                    var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+                        mode: 'xml',
+                        lineNumbers: true,
+                        
+                        lineWrapping:true
+                    });
+                 
+                    $("#progressbar").hide();
+
+
+                    $("#tabs").tabs({ activate: function (event, ui) {
+                        //console.log(ui.newPanel.attr('id'));
+                        if (ui.newPanel && (ui.newPanel.attr('id') == "tab1")) {
+                            //refresh editor
+                            //console.log("refreshing editor");
+                            editor.refresh();
+                        }
+                    }
+                    });
+ 
+                    $("#savesimapp").button().click(function () {
+                        saveGraphic(editor.getValue());                       
+                    });
+                    $("#deletesimapp").button().click(function () {
+                        deleteGraphic(editor.getValue());
+                        
+                    });
+
+                    //TODO update it for SVG
+                    // http: //localhost/sim/WebApp/HumModBrowser.htm#Hemodynamics.Burkhoff_Kofranek.13.10.fmu/37
+                    //load model and screen - separated by /
+                    var myUrlHash = document.location.hash;
+                    console.log("url of request:" + myUrlHash);
+                    //model and screen in Hash
+                    if (myUrlHash.length > 0) {
+                        var items2load = myUrlHash.split('/');
+                        var modelName = items2load[0].substr(1);
+                        console.log("modelname:" + modelName);
+                        getSelectedItemByModelName(modelName);
+                        var simulatorName = items2load[1];
+                        console.log("simulatorname:" + simulatorName);
+                        loadSimApp(simulatorName);
+                    }
+                    
+                </script>
+            </div>
+        </div>                
+    </body>
+</html>
+
+  

@@ -11,11 +11,6 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using NLog;
 using RestMasterService.ComputationNodes;
-//using ServiceStack.Common.Net30;
-//using ServiceStack.Net30.Collections.Concurrent;
-//using ServiceStack.Redis.Support;
-//using ServiceStack.ServiceHost;
-//using ServiceStack.WebHost.Endpoints;
 using IdentificationAlgorithm;
 using System.Diagnostics;
 using SimulatorBalancerLibrary;
@@ -30,6 +25,7 @@ using ServiceStack.Api.Swagger.Support;
 [assembly: NOJVM(true), LOGFILE("matlablog.txt")]
 namespace RestMasterService.WebApp
 {
+    /* Performs external call of matlab library to estimate parameters, pass all arguments from the user, notify about the changes the clients. */
     public class IdentifyStateTicker
     {
         // Singleton instance
@@ -50,8 +46,8 @@ namespace RestMasterService.WebApp
         private double IApopulationsize = 0;
         private double IAtolfun = 0;
         //TODO self detection
-        //string masterserviceurl = "http://localhost/identifikace3/";
-        string masterserviceurl = "http://localhost:51382/";
+        string masterserviceurl = "http://localhost/identifikace3/";
+        //string masterserviceurl = "http://localhost:51382/";
         Random random = new Random();
         Logger logger = LogManager.GetLogger("MyClassName");
         //private readonly ConcurrentDictionary<string, Stock> _stocks = new ConcurrentDictionary<string, Stock>();
@@ -108,42 +104,7 @@ namespace RestMasterService.WebApp
                 }
             }
         }
-        /*
-        private static IEnumerable<KeyValuePair<string, string>> GetBindings(HttpContext context)
-        {
-            // Get the Site name  
-            string siteName = System.Web.Hosting.HostingEnvironment.SiteName;
 
-            // Get the sites section from the AppPool.config 
-            Microsoft.Web.Administration.ConfigurationSection sitesSection =
-                Microsoft.Web.Administration.WebConfigurationManager.GetSection(null, null, "system.applicationHost/sites");
-
-            foreach (Microsoft.Web.Administration.ConfigurationElement site in sitesSection.GetCollection())
-            {
-                // Find the right Site 
-                if (String.Equals((string)site["name"], siteName, StringComparison.OrdinalIgnoreCase))
-                {
-
-                    // For each binding see if they are http based and return the port and protocol 
-                    foreach (Microsoft.Web.Administration.ConfigurationElement binding in site.GetCollection("bindings"))
-                    {
-                        string protocol = (string)binding["protocol"];
-                        string bindingInfo = (string)binding["bindingInformation"];
-
-                        if (protocol.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                        {
-                            string[] parts = bindingInfo.Split(':');
-                            if (parts.Length == 3)
-                            {
-                                string port = parts[1];
-                                yield return new KeyValuePair<string, string>(protocol, port);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        */
 
         [LogException]
         public void IdentifyComputation()
