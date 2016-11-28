@@ -8,11 +8,11 @@
     <script type="text/javascript" src="https://ds.eduid.cz/ds.js"></script>    
     
     <!-- excel like tables, http://handsontable.com/ -->
-    <script src="../Scripts/jquery-2.2.0.min.js"></script>
+    <script src="../Scripts/jquery-1.12.4.min.js"></script>
     <script src="../Scripts/jquery.handsontable.full.js"></script>
+    <!-- http push technology to notify clients - signalr  http://signalr.net/ -->
+    <script src="../Scripts/jquery.signalR-1.2.2.min.js" type="text/javascript"></script>
 
-    <!--Reference the SignalR library. -->
-    <script src="../Scripts/jquery.signalR-2.2.0.min.js"></script>
     <link rel="stylesheet" media="screen" href="../Scripts/jquery.handsontable.full.css"/>
     <link rel="stylesheet" media="screen" href="../Scripts/javascript-tabs.css"/>
     
@@ -46,8 +46,10 @@
 </head>
     <body>
               <div id="wrapper">
+                <div id="accountinfo>
               <a id="loginText2" href="/Shibboleth.sso/Login" onclick="startOverlay(event)">Login via EDUID.CZ</a><iframe name='myIFrame' id="Iframe2" style='display: none'></iframe>
               <a href='#' onClick="login();" id="loginText"> Login via Google Account </a><a href="#" style="display: none" id="loginText" target='myIFrame' onclick="myIFrame.location = 'https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a><iframe name='myIFrame' id="Iframe1" style='display: none'></iframe>
+                </div>
               <b id='uName'> Not logged in.&nbsp;</b> 
               <div id="tabContainer">
                   <div id="tabs">
@@ -199,16 +201,20 @@
                       </div>
                       <div id="tabpage_4" class="tabpage">
                           <h2>Identifikace</h2>
-                          <p>Identifikační algoritmus je časově náročný, pro nepřihlášené uživatele probíhá na výpočetních zdrojích Ústavu Patologické fyziologie 1.LFUK. Pro přihlášené uživatele je možné distribuovat výpočet do superpočítačových center v ČR (grid METACENTRUm, cloud CERIT-SC) zastřešené sdružením CESNET.
-                              Přihlášení je možné zatím pomocí existujícího účtu Google.</p>
+                      <p>Identifikační algoritmus je časově a výpočetně náročný. Nepřihlášení uživatelé mohou prohlížet výsledky. Přihlášení uživatele 
+                              mohou spustit výpočet. Přihlášení je možné zatím pomocí existujícího účtu Google.</p>
                           <div id="identGraph"></div>
                           <div id="computationParamsTable"></div>                          
+                      <div id="hidebuttons">
+                          <button type="button" disabled>Start</button> To start identification, please authenticate.
+                      </div>
                           <div id="buttons">
                               
                               <button type="button" id="startIdentification">Start</button>    
                               <button type="button" id="stopIdentification" display="none">Stop</button>    
                           </div>                         
                           <div id="identTable"></div>
+                          <span id="ssq"></span>
                           <div id="identTimeGraph"></div>
 
                           <div id="messagewrapper">
@@ -223,6 +229,7 @@
                               </div>
 
                           <script>
+                          $('#buttons').hide(); //hide control buttons of identification by default, allowed after auth
                               var g3 = new Dygraph(document.getElementById("identGraph"), data2, {
                                   title:"Experiment vs. průběžný odhad",
                                   drawPoints: true,
@@ -329,6 +336,7 @@
                                   //public long countpercycle { get; set; }public int workerspercycle)
                                   //remove first <li> if the number of messages is too long.
                                   //console.log("number of li " + $('#messages li').length);
+                                  $('#ssq').text('estimated ssq: ' + identifyDTO.ssq);
                                   if ($('#messages li').length > 10) $('#messages li:first').remove();
                                   //TODO variablebalues in graph
 

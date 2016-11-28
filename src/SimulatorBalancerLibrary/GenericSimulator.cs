@@ -22,6 +22,11 @@ namespace SimulatorBalancerLibrary
             return SimulatorBehavior.Simulate(parameternames, parametervalues, variablenamesinresult, timepoints);
         }
 
+        public void notifyssq(double lastbestssq)
+        {
+
+        }
+
         public string Description()
         {
             return SimulatorBehavior.Description();

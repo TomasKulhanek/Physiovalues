@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using ServiceStack;
+
 using ServiceStack.OrmLite;
+using ServiceStack.ServiceInterface;
+
 
 //using RestMasterService.WebApp;
 //using ServiceStack.Redis.Support;

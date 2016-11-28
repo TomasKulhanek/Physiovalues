@@ -2,7 +2,10 @@
 using System.Data;
 using System.Linq;
 using System.Web;
+using ServiceStack;
+using ServiceStack.Common;
 using ServiceStack.OrmLite;
+using ServiceStack.ServiceInterface;
 
 namespace RestMasterService.WebApp
 {

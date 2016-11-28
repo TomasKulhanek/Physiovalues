@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using RestMasterService.WebApp;
-using ServiceStack;
-//using ServiceStack.Common.Extensions;
+using ServiceStack.Common.Extensions;
 using ServiceStack.OrmLite;
-//using ServiceStack.Redis.Support;
-//using ServiceStack.ServiceHost;
-//using ServiceStack.ServiceInterface;
+using ServiceStack.Redis.Support;
+using ServiceStack.ServiceHost;
+using ServiceStack.ServiceInterface;
 
 namespace RestMasterService.ComputationNodes
 {
@@ -54,7 +53,7 @@ namespace RestMasterService.ComputationNodes
         public object Get(Results request)
         {
             return request.Ids.IsEmpty()
-                ? Repository.GetAll()
+                ? Repository.GetAllResultsMeta()
                 : Repository.GetByIds(request.Ids);
         }
 
@@ -115,12 +114,11 @@ namespace RestMasterService.ComputationNodes
             }
 
         }
-        
         public void DeleteFromDB(params long[] Ids)
         {
             using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
-                db.DeleteById<ResultDTO>(Ids);
+                db.DeleteByIdParam<ResultDTO>(Ids);
             }
 
         }
@@ -179,9 +177,9 @@ namespace RestMasterService.ComputationNodes
             //throw new NotImplementedException();
         }
 
-        public List<ResultMetaDTO> GetAllResultsMeta()
+        public List<ResultDTO> GetAllResultsMeta()
         {
-            return ResultDtos.Select(p => new ResultMetaDTO(){Id= p.Id, Name = p.name}).ToList();
+            return ResultDtos.Select(p => new ResultDTO(){Id= p.Id, name = p.name, countcycles=p.countcycles,Ssq=p.Ssq}).ToList();
         }
     }
 }

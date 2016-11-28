@@ -44,7 +44,8 @@ namespace RestMasterService.WebApp
 
                 if ((response == null) || (response.GetType() == typeof(Worker)))
                 {
-                    var myrepository = HostContext.Container.Resolve<WorkersRepository>();
+//                    var myrepository = HostContext.Container.Resolve<WorkersRepository>();
+                    var myrepository = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<WorkersRepository>();
                     hub.Clients.All.updateModels(myrepository.GetModelNames());
                 }
                 else if (response.GetType() == typeof(IdentifyDTO)) hub.Clients.All.updateIdentifyProcess(response);

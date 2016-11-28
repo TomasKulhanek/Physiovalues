@@ -11,17 +11,17 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using NLog;
 using RestMasterService.ComputationNodes;
+using ServiceStack.Common.Net30;
+//using ServiceStack.Net30.Collections.Concurrent;
+using ServiceStack.Redis.Support;
+using ServiceStack.ServiceHost;
+using ServiceStack.WebHost.Endpoints;
+
 using IdentificationAlgorithm;
 using System.Diagnostics;
 using SimulatorBalancerLibrary;
 using IdentifyDTO = RestMasterService.ComputationNodes.IdentifyDTO;
 using Worker = RestMasterService.ComputationNodes.Worker;
-using PostSharp.Patterns.Diagnostics;
-using PostSharp.Extensibility;
-using ServiceStack;
-using ServiceStack.Api.Swagger.Support;
-
-//using PostSharp.Extensibility;
 [assembly: NOJVM(true), LOGFILE("matlablog.txt")]
 namespace RestMasterService.WebApp
 {
@@ -58,7 +58,8 @@ namespace RestMasterService.WebApp
             Clients = clients;
             //adds defaoult worker
             //TODO add it here ?
-            var myrepository = HostContext.Container.Resolve<WorkersRepository>();
+            var myrepository = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<WorkersRepository>();
+//            var myrepository = HostContext.Container.Resolve<WorkersRepository>();
             var w = new Worker{ModelName = "mysinc",RestUrl = "mysinc",WorkerType="test"};
             myrepository.Store(w);
         }
@@ -106,7 +107,7 @@ namespace RestMasterService.WebApp
         }
 
 
-        [LogException]
+
         public void IdentifyComputation()
         {
             //set generic simulator behavior - strategy
@@ -192,7 +193,8 @@ namespace RestMasterService.WebApp
             //var myssq = ((MWIndexArray) o).
             //TODO should it be implemented in MATLAB class instead of directly in here?
             //get workers url
-            var myrepository = HostContext.Container.Resolve<WorkersRepository>();
+            var myrepository = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<WorkersRepository>();
+//            var myrepository = HostContext.Container.Resolve<WorkersRepository>();
             //var workers = (List<Worker>) myrepository.GetByModelName(identify.model);
             var workers = (List<Worker>)myrepository.GetByModelName(modelname);
             //compute on the first worker (expected that first worker is in localhost)
@@ -217,7 +219,8 @@ namespace RestMasterService.WebApp
                                       Experimentalvalues = variable_values
                                   };
             //Clients.All.closeIdentifyProcess(responseDto);
-            var repositoryResult = HostContext.Container.Resolve<ResultRepository>();
+            var repositoryResult = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<ResultRepository>();
+//            var repositoryResult = HostContext.Container.Resolve<ResultRepository>();
             repositoryResult.Store(responseDto);
             Clients.All.closeIdentifyProcessandResultUpdate(responseDto,repositoryResult.GetAllResultsMeta());
         }

@@ -4,17 +4,12 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using NLog;
 using RestMasterService.ComputationNodes;
-//using ServiceStack.ServiceClient.Web;
-//using ServiceStack.ServiceHost;
+using ServiceStack.ServiceClient.Web;
+using ServiceStack.ServiceHost;
 //
 //using System;
 using System.Linq;
-using PostSharp.Patterns.Diagnostics;
-using PostSharp.Extensibility;
-using ServiceStack;
 
-//using PostSharp.Patterns.Diagnostics;
-//using PostSharp.Extensibility;
 /*using System.Configuration;
 using System.Collections.Generic;
 //using RestMasterService.WebApp;
@@ -208,7 +203,7 @@ namespace SimulatorBalancerLibrary
         }
 
         //TODO move to another object to keep POCO
-        [Log]
+
         private void UpdateIdentifyProcess(string[] parameternames, double[][] parametervalues, double[][][] result)
         {
             if (!stopwatch.IsRunning) { stopwatch.Start(); lastcomputationcycle = computationcycle; }
@@ -271,13 +266,11 @@ namespace SimulatorBalancerLibrary
 
 
 
-        [Log]
         public double[][] Simulate(string wurl,string[] parameternames, double[] parametervalues, string[] variablenamesinresult, double[] timepoints)
         {
             return Compute(wurl, parameternames, parametervalues, timepoints,variablenamesinresult);
         }
 
-        [Log]
         public double[][] Simulate(string[] parameternames, double[] parametervalues, string[] variablenamesinresult, double[] timepoints)
         {
             getWorkerURLs(this.ModelName);
@@ -289,7 +282,7 @@ namespace SimulatorBalancerLibrary
 
 
 
-        //[LogException]
+
         public double[][] Compute(string simulateworkerurl, string[] parameternames, double[] doubles, double[] timepoints, string[] variablenamesinresult)
         {            
             var client = new JsonServiceClient(simulateworkerurl);

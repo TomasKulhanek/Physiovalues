@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using ServiceStack;
+using ServiceStack.ServiceInterface;
 
 namespace RestMasterService.WebApp
 {

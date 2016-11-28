@@ -1,4 +1,6 @@
 ﻿using System;
+using ServiceStack;
+using ServiceStack.ServiceInterface;
 
 namespace RestMasterService.WebApp
 {
