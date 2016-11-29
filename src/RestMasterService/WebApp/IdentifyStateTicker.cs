@@ -48,7 +48,7 @@ namespace RestMasterService.WebApp
         private double IApopulationsize = 0;
         private double IAtolfun = 0;
         //TODO self detection
-        string masterserviceurl = "http://localhost/identifikace3/";
+        string masterserviceurl = "http://localhost/identifikace/";
         //string masterserviceurl = "http://localhost:51382/";
         Random random = new Random();
         Logger logger = LogManager.GetLogger("MyClassName");
