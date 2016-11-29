@@ -1,9 +1,12 @@
 using System;
 using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hosting;
 using RestMasterService.ComputationNodes;
 using ServiceStack;
-using ServiceStack.Web;
-using IRequest = ServiceStack.Web.IRequest;
+using ServiceStack.ServiceHost;
+using ServiceStack.WebHost.Endpoints;
+
+//using IRequest = ServiceStack.Web.IRequest;
 
 //using IRequest = Microsoft.AspNet.SignalR.IRequest;
 
@@ -34,17 +37,18 @@ namespace RestMasterService.WebApp
             }
         }*/
 
-        public void ResponseFilter(IRequest req, IResponse res, object response)
+
+        public void ResponseFilter(IHttpRequest req, IHttpResponse res, object response)
         {
 
             //TODO avoid memory leaks
-            var hub = GlobalHost.ConnectionManager.GetHubContext<dynamic>();
+            var hub = GlobalHost.ConnectionManager.GetHubContext<IdentifyStateHub>();
             if (hub != null)
             {
 
                 if ((response == null) || (response.GetType() == typeof(Worker)))
                 {
-//                    var myrepository = HostContext.Container.Resolve<WorkersRepository>();
+                    //                    var myrepository = HostContext.Container.Resolve<WorkersRepository>();
                     var myrepository = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<WorkersRepository>();
                     hub.Clients.All.updateModels(myrepository.GetModelNames());
                 }

@@ -2,8 +2,9 @@
 using System.Data;
 using System.Linq;
 using ServiceStack;
-
+using ServiceStack.Common.Extensions;
 using ServiceStack.OrmLite;
+using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface;
 
 
@@ -70,7 +71,7 @@ namespace RestMasterService.WebApp
 
         public void UploadFromDB()
         {
-            using (IDbConnection db = AppHost.OpenDbConnection())
+            using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
                 _graphicDtos = db.Select<GraphicDTO>();
             }
@@ -78,7 +79,7 @@ namespace RestMasterService.WebApp
 
         public void StoreToDB()
         {
-            using (IDbConnection db = AppHost.OpenDbConnection())
+            using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
                 db.InsertAll(_graphicDtos);
             }
@@ -87,7 +88,7 @@ namespace RestMasterService.WebApp
 
         public void InsertToDB(GraphicDTO Idto)
         {
-            using (IDbConnection db = AppHost.OpenDbConnection())
+            using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
                 db.Insert(Idto);
             }
@@ -96,7 +97,7 @@ namespace RestMasterService.WebApp
 
         public void UpdateToDB(GraphicDTO Idto)
         {
-            using (IDbConnection db = AppHost.OpenDbConnection())
+            using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
                 db.Update(Idto);                
             }
@@ -104,7 +105,7 @@ namespace RestMasterService.WebApp
         }
         public void DeleteFromDB(params long[] Ids)
         {
-            using (IDbConnection db = AppHost.OpenDbConnection())
+            using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
                 //db.DeleteByIdParam<GraphicDTO>(Ids);
                 db.DeleteByIds<GraphicDTO>(Ids);

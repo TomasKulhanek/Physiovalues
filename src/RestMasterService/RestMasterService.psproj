@@ -1,6 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.postsharp.org/1.0/configuration" xmlns:dg="clr-namespace:PostSharp.Patterns.Diagnostics;assembly:PostSharp.Patterns.Diagnostics">
-  <Property Name="LoggingBackend" Value="nlog" />
-  <Using File="..\packages\PostSharp.Patterns.Diagnostics.4.2.21\tools\PostSharp.Patterns.Diagnostics.Weaver.dll" />
-  <Using File="..\packages\PostSharp.Patterns.Diagnostics.NLog.4.2.21\tools\PostSharp.Patterns.Diagnostics.Weaver.NLog.dll" />
+  <Property Name="LoggingBackend" Value="trace" />
 </Project>

@@ -54,7 +54,9 @@ function getUserInfo() {
             user = resp;
             //console.log(user);
             $('#uName').text('Welcome ' + user.name);
-            $('#imgHolder').attr('src', user.picture);
+            //show control buttons - allow identification
+            $('#buttons').show();
+            $('#hidebuttons').hide();
         },
         dataType: "jsonp"
     });
@@ -77,5 +79,7 @@ function startLogoutPolling() {
     $('#logoutText').hide();
     loggedIn = false;
     $('#uName').text('Not logged in. ');
+    $('#buttons').hide();
+    $('#hidebuttons').show();
     $('#imgHolder').attr('src', 'none.jpg');
 }

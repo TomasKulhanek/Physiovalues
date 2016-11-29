@@ -33,12 +33,12 @@
         #identTimeGraph { width:600px; height: 200px; float:right; }
         #currentRow {background-color: lightblue}
         #currentCol {background-color: lightblue}
-        #loginText {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
-        #loginText2 {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
+        #accountinfo {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
+        #loginText2x {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
         #uName {float: right;font-size: 80%;padding-top: 2px;}
         #buttons { float: left;}
         #messages { font-size: 80%;}
-        #messagewrapper {float: left;}
+        #messagewrapper {float: left;font-size:0.5em}
         #graphsettingswrapper { float: right;}
         
         select  {  overflow: hidden;background-color: #ffdfdf;color:black;  border:1px solid #000;  padding:5px 3px 5px 10px; }
@@ -46,7 +46,7 @@
 </head>
     <body>
               <div id="wrapper">
-                <div id="accountinfo>
+                <div id="accountinfo">
               <a id="loginText2" href="/Shibboleth.sso/Login" onclick="startOverlay(event)">Login via EDUID.CZ</a><iframe name='myIFrame' id="Iframe2" style='display: none'></iframe>
               <a href='#' onClick="login();" id="loginText"> Login via Google Account </a><a href="#" style="display: none" id="loginText" target='myIFrame' onclick="myIFrame.location = 'https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a><iframe name='myIFrame' id="Iframe1" style='display: none'></iframe>
                 </div>
@@ -224,12 +224,13 @@
                           <p id="graphsettings"><b>Show Series:</b></p>
                               <p id="graphsettings2">
                                   <input type=checkbox id="0" checked onClick="changeVisibility(this)">
-                                      <label for="0"> experiment</label><br/></input>      
+                                      <label for="0"> experiment</label><br/> </input>      
                               </p>
                               </div>
 
                           <script>
-                          $('#buttons').hide(); //hide control buttons of identification by default, allowed after auth
+                              $('#buttons').show(); //hide control buttons of identification by default, allowed after auth
+                              $('#hidebuttons').hide();
                               var g3 = new Dygraph(document.getElementById("identGraph"), data2, {
                                   title:"Experiment vs. průběžný odhad",
                                   drawPoints: true,
@@ -266,7 +267,7 @@
                                   
                                   $('#messages').append('<li> Final result: ' + identifyDTO.Parametervalues+'</li>');
                                   $('#messages').append('<li> Elapsed time: ' + identifyDTO.elapsedtime + '</li>');
-                                  $('#messages').append('<li> Simulation time: ' + identifyDTO.simulationtime + '</li>');
+                                  //$('#messages').append('<li> Simulation time: ' + identifyDTO.simulationtime + '</li>');
                                   //remove first <li> if the number of messages is too long.
                                   //console.log("number of li " + $('#messages li').length);
                                   if ($('#messages li').length > 10) $('#messages li:first').remove();
@@ -336,7 +337,7 @@
                                   //public long countpercycle { get; set; }public int workerspercycle)
                                   //remove first <li> if the number of messages is too long.
                                   //console.log("number of li " + $('#messages li').length);
-                                  $('#ssq').text('estimated ssq: ' + identifyDTO.ssq);
+                                  $('#ssq').text('estimated ssq: ' + identifyDTO.Ssq);
                                   if ($('#messages li').length > 10) $('#messages li:first').remove();
                                   //TODO variablebalues in graph
 
@@ -467,9 +468,9 @@
                                   var length = results.length;
 
                                   for (var i = 0; i < length; i++) {
-                                      console.log("id " + results[i].Id + " name " + results[i].Name);
+                                      console.log("id " + results[i].Id + " name " + results[i].name);
 
-                                      selectionText += "<option value='" + results[i].Id + "' onclick='changeResultView(this)'>" + results[i].Name + "</option>";
+                                      selectionText += "<option value='" + results[i].Id + "' onclick='changeResultView(this)'>" + results[i].name + "</option>";
                                   }
                                   console.log(selectionText);
                                   $('#selectresult').html(selectionText);

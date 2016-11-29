@@ -9,13 +9,16 @@ using System.Web.SessionState;
 using RestMasterService.ComputationNodes;
 //using ServiceStack.WebHost.Endpoints;
 using System.Security.Principal;
-using RestMasterService.Shibboleth;
+using RestMasterService.WebApp;
 using ServiceStack;
-using ServiceStack.Auth;
-using ServiceStack.Authentication.OAuth2;
-using ServiceStack.Caching;
+using ServiceStack.CacheAccess;
+using ServiceStack.CacheAccess.Providers;
+using ServiceStack.Common;
 using ServiceStack.Configuration;
 using ServiceStack.OrmLite;
+using ServiceStack.ServiceInterface;
+using ServiceStack.ServiceInterface.Auth;
+using ServiceStack.WebHost.Endpoints;
 
 namespace RestMasterService
 {
@@ -59,7 +62,7 @@ namespace RestMasterService
                 var mygrrepository = container.Resolve<GraphicRepository>();
                 mygrrepository.UploadFromDB();
 
-                SetConfig(new HostConfig { DefaultRedirectPath = "/WebApp/GenericUI.html" });
+//                SetConfig(new HostConfig { DefaultRedirectPath = "/WebApp/GenericUI.html" });
                 //Set once before use (i.e. in a static constructor).
                 OrmLiteConfig.DialectProvider = SqlServerDialect.Provider;
                 //SqlServerDialect.Provider.
@@ -67,7 +70,7 @@ namespace RestMasterService
 
                 using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
                 {
-                    db.CreateTable<ResultDTO>(false);
+                    //db.CreateTable<ResultDTO>(false);
                     //db.Insert(new IdentifyDTO()ple { Id = 1, Name = "Hello, World!" });
                     //var rows = db.Select<SimpleExample>();
 
@@ -87,15 +90,15 @@ namespace RestMasterService
                 ));
                 Plugins.Add(new AuthFeature(() => new AuthUserSession(),
         new IAuthProvider[] {
-        new ShibbolethAuthProvider(),
         new TwitterAuthProvider(appSettings),
         new FacebookAuthProvider(appSettings),
-        new GoogleOAuth2Provider(appSettings), 
+        new OAuthProvider(), 
+  //      new GoogleOAuth2Provider(appSettings), 
     })
                 {
                     HtmlRedirect = "~/",
-                    IncludeRegistrationService = true,
-                    MaxLoginAttempts = appSettings.Get("MaxLoginAttempts", 5),
+//                    IncludeRegistrationService = true,
+//                    MaxLoginAttempts = appSettings.Get("MaxLoginAttempts", 5),
                 });
                 Plugins.Add(new RegistrationFeature());
 
@@ -114,11 +117,13 @@ namespace RestMasterService
         }
         void Application_Start(object sender, EventArgs e)
         {
-            new AppHost().Init();
-            var myrepository = HostContext.Container.Resolve<ResultRepository>();
+            //new AppHost().Init();
+            var myrepository = ((AppHostBase)EndpointHost.AppHost).Container.Resolve<ResultRepository>();
             myrepository.UploadFromDB();
+            //var myrepository = HostContext.Container.Resolve<ResultRepository>();
+            //myrepository.UploadFromDB();
             // Code that runs on application startup
-            //RouteTable.Routes.MapHubs();
+            RouteTable.Routes.MapHubs();
             //RouteTable.Routes.IgnoreRoute("WebApp/{*pathInfo}");
             //RouteTable.Routes.MapHubs();
 

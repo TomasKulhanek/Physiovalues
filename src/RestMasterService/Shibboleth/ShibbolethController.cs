@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.Mvc;
 
 namespace RestMasterService.Shibboleth
 {
-    public class ShibbolethController : Controller
+    public class ShibbolethController 
     {
-        protected new ShibbolethPrincipal User
-        {
-            get { return (base.User as ShibbolethPrincipal) ?? null; //ShibbolethPrincipal.GetUnauthorizedPrincipal();
-            }
+        protected new ShibbolethPrincipal User { get { return null; }
+            //get { return (base as ShibbolethPrincipal) ?? null; //ShibbolethPrincipal.GetUnauthorizedPrincipal();
+            //}
         }
     }
 }

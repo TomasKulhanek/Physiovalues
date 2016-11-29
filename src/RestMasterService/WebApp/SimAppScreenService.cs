@@ -5,6 +5,7 @@ using System.Web;
 using ServiceStack;
 using ServiceStack.Common;
 using ServiceStack.OrmLite;
+using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface;
 
 namespace RestMasterService.WebApp
@@ -69,7 +70,7 @@ namespace RestMasterService.WebApp
 
         public void UploadFromDB()
         {
-            using (IDbConnection db = AppHost.OpenDbConnection())
+            using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
                 SimAppScreenDtos = db.Select<SimAppScreenDTO>();
                 foreach (var scr in SimAppScreenDtos)
@@ -79,7 +80,7 @@ namespace RestMasterService.WebApp
 
         public void StoreToDB()
         {
-            using (IDbConnection db = AppHost.OpenDbConnection())
+            using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
                 //TODO some encode
                 db.InsertAll(SimAppScreenDtos);
@@ -89,7 +90,7 @@ namespace RestMasterService.WebApp
 
         public void InsertToDB(SimAppScreenDTO Idto)
         {
-            using (IDbConnection db = AppHost.OpenDbConnection())
+            using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
                 var Idtoenc = new SimAppScreenDTO()
                 {
@@ -105,7 +106,7 @@ namespace RestMasterService.WebApp
 
         public void UpdateToDB(SimAppScreenDTO Idto)
         {
-            using (IDbConnection db = AppHost.OpenDbConnection())
+            using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
                 var Idtoenc = new SimAppScreenDTO()
                                   {
@@ -121,7 +122,7 @@ namespace RestMasterService.WebApp
         }
         public void DeleteFromDB(params long[] Ids)
         {
-            using (IDbConnection db = AppHost.OpenDbConnection())
+            using (IDbConnection db = "Data Source=localhost;Initial Catalog=restmasterservice;Integrated Security=True".OpenDbConnection())
             {
                 db.DeleteByIds<SimAppScreenDTO>(Ids);
                 //db.Delete(Ids);

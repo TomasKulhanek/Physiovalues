@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ServiceStack;
-using ServiceStack.Auth;
-using ServiceStack.Web;
+using ServiceStack.ServiceHost;
+using ServiceStack.ServiceInterface;
+using ServiceStack.ServiceInterface.Auth;
 
 //using ServiceStack.ServiceHost;
 //using ServiceStack.ServiceInterface;
@@ -26,11 +27,12 @@ namespace RestMasterService.Shibboleth
                 return sp.firstname!=null;
             }
 
-        public override IHttpResult OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo)
+/*        public override IHttpResult OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo)
         {
             session.FirstName = sp.firstname;
             return base.OnAuthenticated(authService, session, tokens, authInfo);
         }
+        */
 
         /*public override void OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo)
         {
@@ -39,7 +41,7 @@ namespace RestMasterService.Shibboleth
         }*/
         
 
-        /*  public override IHttpResult OnAuthenticated(IServiceBase authService,
+        public override void OnAuthenticated(IServiceBase authService,
                 IAuthSession session, IOAuthTokens tokens,
                 Dictionary<string, string> authInfo)
             {
@@ -48,12 +50,12 @@ namespace RestMasterService.Shibboleth
                 //...
 
                 //Call base method to Save Session and fire Auth/Session callbacks:
-                return base.OnAuthenticated(authService, session, tokens, authInfo);
+                //return base.OnAuthenticated(authService, session, tokens, authInfo);
 
                 //Alternatively avoid built-in behavior and explicitly save session with
                 //authService.SaveSession(session, SessionExpiry);
                 //return null;
-            }*/
+            }
 
     }
 }

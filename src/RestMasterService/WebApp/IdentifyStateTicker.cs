@@ -3,7 +3,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Web;
+using System.Web.Administration;
+
 using MathWorks.MATLAB.NET.Arrays;
 using MathWorks.MATLAB.NET.Utility;
 
@@ -19,6 +20,7 @@ using ServiceStack.WebHost.Endpoints;
 
 using IdentificationAlgorithm;
 using System.Diagnostics;
+using System.Web.Configuration;
 using SimulatorBalancerLibrary;
 using IdentifyDTO = RestMasterService.ComputationNodes.IdentifyDTO;
 using Worker = RestMasterService.ComputationNodes.Worker;
@@ -53,7 +55,7 @@ namespace RestMasterService.WebApp
         //private readonly ConcurrentDictionary<string, Stock> _stocks = new ConcurrentDictionary<string, Stock>();
         //constructor
 
-        private IdentifyStateTicker(IHubConnectionContext<dynamic> clients)
+        private IdentifyStateTicker(IHubConnectionContext clients)
         {
             Clients = clients;
             //adds defaoult worker
@@ -74,7 +76,7 @@ namespace RestMasterService.WebApp
             }
         }
 
-        private IHubConnectionContext<dynamic> Clients
+        private IHubConnectionContext Clients
         {
             get;
             set;
@@ -358,39 +360,6 @@ namespace RestMasterService.WebApp
             else if (port > 0) masterserviceurl = "http://localhost:"+port+"/";//make configurable - hardcoded to physiome.lf1.cuni.cz
             //masterserviceurl = GetBindings();
         }
-
-        private string GetBindings()
-        {
-            // Get the Site name 
-            string siteName = System.Web.Hosting.HostingEnvironment.SiteName;
-
-            // Get the sites section from the AppPool.config
-            
-           Microsoft.Web.Administration.ConfigurationSection sitesSection =
-                Microsoft.Web.Administration.WebConfigurationManager.GetSection(null, null, "system.applicationHost/sites");
-            
-            foreach (Microsoft.Web.Administration.ConfigurationElement site in sitesSection.GetCollection())
-            {
-                // Find the right Site
-                if (String.Equals((string)site["name"], siteName, StringComparison.OrdinalIgnoreCase))
-                {
-
-                    // For each binding see if they are http based and return the port and protocol
-                    foreach (Microsoft.Web.Administration.ConfigurationElement binding in site.GetCollection("bindings"))
-                    {
-                        string protocol = (string)binding["protocol"];
-                        string bindingInfo = (string)binding["bindingInformation"];
-
-                        if (protocol.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                        {
-                            string[] parts = bindingInfo.Split(':');
-                        if (parts.Length == 3) return "http://"+parts[2]+":"+parts[1]+"/";                            
-                        }
-                    }
-                }                
-            }
-            return "http://app.physiovalues.org/";
-        } 
 
         public void SetComputationParams(double[] computationParams)
         { //TODO use some DTO

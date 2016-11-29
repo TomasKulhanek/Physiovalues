@@ -4,11 +4,14 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using NLog;
 using RestMasterService.ComputationNodes;
-using ServiceStack.ServiceClient.Web;
-using ServiceStack.ServiceHost;
+//using ServiceStack.ServiceClient.Web;
+//using ServiceStack.ServiceHost;
 //
 //using System;
 using System.Linq;
+using ServiceStack;
+using ServiceStack.ServiceClient.Web;
+using ServiceStack.ServiceHost;
 
 /*using System.Configuration;
 using System.Collections.Generic;

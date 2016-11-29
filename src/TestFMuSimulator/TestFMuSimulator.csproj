@@ -5,13 +5,14 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{375C14D5-B22D-468B-8138-D22146EFBB99}</ProjectGuid>
+    <ProjectGuid>{0D4DF89B-E9EB-4063-B555-32F7A404B108}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Default2Ini</RootNamespace>
-    <AssemblyName>Default2Ini</AssemblyName>
+    <RootNamespace>TestFMuSimulator</RootNamespace>
+    <AssemblyName>TestFMuSimulator</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -43,12 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HumModFileConvert.cs" />
-    <Compile Include="HumModConvert.cs" />
-    <Compile Include="IConvertBehavior.cs" />
-    <Compile Include="PhysiomodelConvert.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimulatorBalancerLibrary\SimulatorBalancerLibrary.csproj">
+      <Project>{456E3355-F296-4A00-977B-DFE87D46F75A}</Project>
+      <Name>SimulatorBalancerLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="TestFMuSimulator.psproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
