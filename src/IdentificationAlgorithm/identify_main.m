@@ -42,7 +42,8 @@ function p_fitted = identify_main(experiment,p_names,p_val,p_min,p_max,p_is_fixe
 %  ans1 = methods('SimulatorBalancerLibrary.GenericSimulator','-full');
 %  identify_log('method signatures',ans1);
 % debug write input arguments
-dirname = 'c:\Users\tomaton\Documents\KOFRLAB-simenv\VersionedProjects\';
+% do not work dirname = '..\logs';
+global dirname;
  dlmwrite(strcat(dirname,'experiment.mat'),experiment);
  dlmwrite(strcat(dirname,'p_names.mat'),p_names);
  dlmwrite(strcat(dirname,'p_val.mat'),p_val);
@@ -53,7 +54,8 @@ dirname = 'c:\Users\tomaton\Documents\KOFRLAB-simenv\VersionedProjects\';
  dlmwrite(strcat(dirname,'model_name.mat'),model_name);
  dlmwrite(strcat(dirname,'update_url.mat'),update_url);
  global filename
- filename = strcat(dirname,'matlab.log');
+ % set in geaoptimset filename = strcat(dirname,'matlab.log');
+ identify_logs('initialized, pwd:',pwd);
     [p_fitted, val] = identify_minimize( experiment, p_names,p_min,p_max, ...
         p_val, p_is_fixed,variable_names);
     global result_ssq

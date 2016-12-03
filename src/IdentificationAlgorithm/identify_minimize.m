@@ -60,7 +60,7 @@ identify_logs('identify_minimize','debug');
             %elitecount = idivide(n_nonfixed, 4);
             %newoptions = gaoptimset('EliteCount',elitecount);
             %myoptions = gaoptimset(gaoptions,newoptions);
-            
+            identify_logs('starting identification process at:',datestr(now));
             p_nonfixed_fitted = ga(@identify_objective,n_nonfixed,[],[],[],[], p_min, p_max,[],gaoptions);
             %time_ga_serial = toc(start_time);
             %------------------------------------------------------------------

@@ -1,5 +1,6 @@
 function identify_log(title,message)
-filename = 'c:\Users\tomaton\Documents\KOFRLAB-simenv\VersionedProjects\matlab.log';
+%filename = 'c:\Users\tomaton\Documents\KOFRLAB-simenv\VersionedProjects\matlab.log';
+global filename;
 fid=fopen(filename,'a');
 [rows,cols] = size(message);
   fprintf(fid,'--------- %s \n',title);

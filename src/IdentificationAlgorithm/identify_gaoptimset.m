@@ -1,5 +1,8 @@
 function identify_gaoptimset(generations,populations,tolfun)
-
+global dirname;
+dirname = 'c:\Users\tomaton\Documents\KOFRLAB-simenv\VersionedProjects\';
+ global filename;
+ filename = strcat(dirname,'matlab.log');
 global gaoptions;
 gaoptions = gaoptimset(...
     'Vectorized','on',...

@@ -120,7 +120,7 @@ namespace RestMasterService.WebApp
                 logger.Log(NLog.LogLevel.Info, "starting calculation ");
                 //invoke matlab Identification algorithm - does it use the GenericSimulator instance configured before???
                 Class1 class1 = new Class1();
-                logger.Log(NLog.LogLevel.Debug, "class1 init");
+                logger.Log(NLog.LogLevel.Debug, "class1 initialized");
                 //set experiment variables and values
                 MWArray v_names = new MWCellArray(new MWCharArray(Enumerable.ToArray(variable_names)));
                 MWArray experiment = new MWNumericArray(variable_values);
@@ -145,7 +145,7 @@ namespace RestMasterService.WebApp
                     MWArray tolfun = new MWNumericArray(IAtolfun);
                     class1.identify_gaoptimset(generations, populationsize, tolfun);
                 } //otherwise the matlab algorithm has it's own default values
-                logger.Log(NLog.LogLevel.Debug, "mwarray init");
+                logger.Log(NLog.LogLevel.Debug, "mwarray and gaoptimset initialized.");
                 var result = class1.identify_main(experiment, p_names, p_val, p_min, p_max, p_is_fixed, v_names, modelname, masterserviceurl);
                 logger.Log(NLog.LogLevel.Debug, "identify_main done");
                 sw.Stop();
