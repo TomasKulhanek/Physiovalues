@@ -121,6 +121,7 @@ namespace RestMasterService.WebApp
                 //invoke matlab Identification algorithm - does it use the GenericSimulator instance configured before???
                 Class1 class1 = new Class1();
                 logger.Log(NLog.LogLevel.Debug, "class1 initialized");
+                
                 //set experiment variables and values
                 MWArray v_names = new MWCellArray(new MWCharArray(Enumerable.ToArray(variable_names)));
                 MWArray experiment = new MWNumericArray(variable_values);

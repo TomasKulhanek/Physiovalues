@@ -11,7 +11,7 @@
     <script src="../Scripts/jquery-1.12.4.min.js"></script>
     <script src="../Scripts/jquery.handsontable.full.js"></script>
     <!-- http push technology to notify clients - signalr  http://signalr.net/ -->
-    <script src="../Scripts/jquery.signalR-1.2.2.min.js" type="text/javascript"></script>
+    <script src="../Scripts/jquery.signalR-1.2.2.js" type="text/javascript"></script>
 
     <link rel="stylesheet" media="screen" href="../Scripts/jquery.handsontable.full.css"/>
     <link rel="stylesheet" media="screen" href="../Scripts/javascript-tabs.css"/>
@@ -69,11 +69,24 @@
                               Parametry jsou vypočítané tak, aby model který popisuje fungování systému byl co nejvíce ve shodě s naměřenými experimentálními daty.
                           </p>
                           <p >Vyberte model, (číslo v závorce počet výpočetních uzlů pro model):</p>
-                          <select size="10" name="selectionField" id="models" onchange="getSelectedModel(this)"> 
-                              <option value="mysinc" >testovací model</option>  
+                          <select size="10" name="selectionField" id="models" onchange="getSelectedModel(this)">
+                              <option value="mysinc">testovací model</option>
                           </select>
+                          <div id="uploadFMU" style="display: none">
+                              <p>Upload FMU</p>
+                              <form action="../UploadFMU" method="POST" enctype="multipart/form-data">
+                                  <label><b>Upload FMU</b></label>
+                                  <div><input type="text" id="url" name="url" placeholder="Enter url to upload via Web" /></div>
+                                  <div><input type="file" name="img" id="img" /> <button type="submit">Upload</button></div>
+                              </form>
+                          </div>
                       </div>
                       <script>
+                          //$.connection.hub.url = "../identifikace6/signalr";
+                          //console.log('setting signalr');
+                          //$.connection.hub.logging = true;
+                          //$.connection.hub.url = '../signalr';
+                          console.log($.connection.hub.url);
                           var selectedModel = '';
                           function getSelectedModel(sel) {
                               console.log("getselectedmodel");
@@ -232,7 +245,7 @@
                               $('#buttons').show(); //hide control buttons of identification by default, allowed after auth
                               $('#hidebuttons').hide();
                               var g3 = new Dygraph(document.getElementById("identGraph"), data2, {
-                                  title:"Experiment vs. průběžný odhad",
+                                  title:"data vs. estimate",
                                   drawPoints: true,
                                   labels: glabels,
                                   showRangeSelector: true
@@ -241,13 +254,13 @@
                               var computationParams = [[2000,10,1.0e-20]];
                               var estimatedTime = 0;
                               var g3time = new Dygraph(document.getElementById("identTimeGraph"), dataTime, {
-                                  title: "výkon výpočtu identifikace",
+                                  title: "computation performance",
                                   drawPoints:true,
                                   labels: ["time","count/sec"],
                                   showRangeSelector: false
                               });                              
                               var estimatedParameters = [["a",0.7]];
-                              
+                              //$.connection.hub.url = "../signalr";
                               var fakeidentifystate = $.connection.fakeidentifystate;
                               //change visibility of series in graph
                               function changeVisibility(el) {

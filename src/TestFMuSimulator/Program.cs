@@ -26,6 +26,7 @@ namespace TestFMuSimulator
             var timepoints = new double[]{0,5,10,15,20,25,30,35,40,45,50,55,60};
             //http://ipv4.fiddler http://localhost.fiddler
             string workerurl = "http://localhost.fiddler:48051/worker/simulation/MatejakAB2013_Kulhanek2013.fmu";
+            Console.WriteLine("url:"+workerurl);
             rfmu.RestURLs = new string[]{workerurl};
             var results = rfmu.Simulate( pnames,pvalues,vnames,timepoints);
             if (results.Length!=3) throw new Exception("Test must return 3 arrays of results.");

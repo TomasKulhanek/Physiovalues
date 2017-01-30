@@ -57,6 +57,8 @@ function getUserInfo() {
             //show control buttons - allow identification
             $('#buttons').show();
             $('#hidebuttons').hide();
+            //if (user.name=='Tomas Kulhanek')
+            $('#uploadFMU').show();
         },
         dataType: "jsonp"
     });
@@ -81,5 +83,6 @@ function startLogoutPolling() {
     $('#uName').text('Not logged in. ');
     $('#buttons').hide();
     $('#hidebuttons').show();
+    $('#uploadFMU').hide();
     $('#imgHolder').attr('src', 'none.jpg');
 }

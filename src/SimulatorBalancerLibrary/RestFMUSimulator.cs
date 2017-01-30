@@ -1,30 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
-using NLog;
 using RestMasterService.ComputationNodes;
-//using ServiceStack.ServiceClient.Web;
-//using ServiceStack.ServiceHost;
-//
-//using System;
 using System.Linq;
-using ServiceStack;
 using ServiceStack.ServiceClient.Web;
 using ServiceStack.ServiceHost;
-
-/*using System.Configuration;
-using System.Collections.Generic;
-//using RestMasterService.WebApp;
-using ServiceStack.Configuration;
-using ServiceStack.Common;
-using ServiceStack.ServiceHost;
-using ServiceStack.ServiceInterface;
-using ServiceStack.ServiceInterface.Auth;
-using ServiceStack.ServiceInterface.ServiceModel;
-using ServiceStack.WebHost.Endpoints;
-*/
-
 namespace SimulatorBalancerLibrary
 {
     public class RestFMUSimulator : ISimulatorBehavior
@@ -38,7 +20,7 @@ namespace SimulatorBalancerLibrary
         private long lastcomputationcycle= 0 ;
         private long identid;
         private Stopwatch stopwatch=new Stopwatch();
-        private Logger logger = LogManager.GetLogger("RestFMUSimulator");
+        //private Logger logger = LogManager.GetLogger("RestFMUSimulator");
         public RestFMUSimulator(string modelName,string updateURL)
         {
             ModelName = modelName;
@@ -55,11 +37,17 @@ namespace SimulatorBalancerLibrary
         
         public double[][][] Simulate(string[] parameternames, double[][] parametervalues, string[] variablenamesinresult, double[] timepoints)
         {
+            File.AppendAllText("c:\\inetpub\\wwwroot\\identifikace\\logs\\simulatorbalancer.log",
+                DateTime.Now + ":[][][]Simulate()\n");
+            //  logger.Debug("[][][] Simulate()");
             if ((RestURLs==null) || (RestURLs.Length<1))
             {
                 getWorkerURLs(this.ModelName);
                 if (RestURLs.Length < 1)
+                {
+            //        logger.Log(NLog.LogLevel.Error, "No workers accesible via RestURL to compute the simulation.");
                     throw new Exception("No workers accesible via RestURL to compute the simulation.");
+                }
             }
         
 
@@ -209,11 +197,12 @@ namespace SimulatorBalancerLibrary
 
         private void UpdateIdentifyProcess(string[] parameternames, double[][] parametervalues, double[][][] result)
         {
+            File.AppendAllText("c:\\inetpub\\wwwroot\\identifikace\\logs\\simulatorbalancer.log",
+                DateTime.Now + ":UpdateIdentifyProcess without notifyication(), url:" + updateIdentifyProcessURL);
             if (!stopwatch.IsRunning) { stopwatch.Start(); lastcomputationcycle = computationcycle; }
             if (stopwatch.ElapsedMilliseconds > 5000) //update each 5 seconds                                        
             try
             {
-
                 var elapsedmilis = stopwatch.ElapsedMilliseconds;
                 stopwatch.Restart();//restart sw to measure another 5 seconds
                 //servicestack client
@@ -223,6 +212,7 @@ namespace SimulatorBalancerLibrary
                 var client = new JsonServiceClient(updateIdentifyProcessURL);
                 client.Timeout = new TimeSpan(0,5,0);
                 IdentifyDTO identifyDto;
+                /*
                 if (identid == 0)
                 {
                     identifyDto = client.Post<IdentifyDTO>(new IdentifyDTO()
@@ -239,6 +229,8 @@ namespace SimulatorBalancerLibrary
                                                                    workerspercycle = workerspercycle
                                                                });
                     identid = identifyDto.Id;
+                    File.AppendAllText("c:\\inetpub\\wwwroot\\identifikace\\logs\\simulatorbalancer.log",
+                        DateTime.Now + ":UpdateIdentifyProcess(), id:" + identid);
                 }
                 else
                 {
@@ -254,12 +246,17 @@ namespace SimulatorBalancerLibrary
                                           countpercycle = computationcycle - lastcomputationcycle,
                                           workerspercycle = workerspercycle
                                       };
-
                     client.Put(identifyDto);
-                }
+                    File.AppendAllText("c:\\inetpub\\wwwroot\\identifikace\\logs\\simulatorbalancer.log",
+    DateTime.Now + ":UpdateIdentifyProcess(), updated at id:" + identid);
+
+                }*/
             } catch (Exception e)
             {
-                logger.Log(NLog.LogLevel.Error, "computation eception",e);//TODO log the error only
+              //  logger.Log(NLog.LogLevel.Error, "computation eception",e);//TODO log the error only
+                File.AppendAllText("c:\\inetpub\\wwwroot\\identifikace\\logs\\simulatorbalancer.log",
+                    DateTime.Now + ":" + e.Message + ":" + e.StackTrace);
+
             }
             finally
             {
@@ -267,15 +264,17 @@ namespace SimulatorBalancerLibrary
             }
         }
 
-
-
         public double[][] Simulate(string wurl,string[] parameternames, double[] parametervalues, string[] variablenamesinresult, double[] timepoints)
         {
-            return Compute(wurl, parameternames, parametervalues, timepoints,variablenamesinresult);
+            File.AppendAllText("c:\\inetpub\\wwwroot\\identifikace\\logs\\simulatorbalancer.log",
+                DateTime.Now + ":[][]Simulate(wurl)\n");
+            return Compute(wurl, parameternames, parametervalues, timepoints, variablenamesinresult);
         }
 
         public double[][] Simulate(string[] parameternames, double[] parametervalues, string[] variablenamesinresult, double[] timepoints)
         {
+            File.AppendAllText("c:\\inetpub\\wwwroot\\identifikace\\logs\\simulatorbalancer.log",
+                DateTime.Now + ":[][]Simulate()\n");
             getWorkerURLs(this.ModelName);
             var wurl = RestURLs[0]; //gets first worker - expected that it is localhost or something near.
             return Compute(wurl, parameternames, parametervalues, timepoints, variablenamesinresult);
@@ -287,7 +286,10 @@ namespace SimulatorBalancerLibrary
 
 
         public double[][] Compute(string simulateworkerurl, string[] parameternames, double[] doubles, double[] timepoints, string[] variablenamesinresult)
-        {            
+        {
+            File.AppendAllText("c:\\inetpub\\wwwroot\\identifikace\\logs\\simulatorbalancer.log",
+                DateTime.Now + ":[][]Compute("+simulateworkerurl+","+parameternames[0]+"...,"+doubles[0]+"...,"+timepoints[0]+"..."+variablenamesinresult[0]+"...)\n");
+            //logger.Debug("[][] Compute()");
             var client = new JsonServiceClient(simulateworkerurl);
             client.Timeout = new TimeSpan(0, 15, 0);
             string vnames = "";
@@ -312,7 +314,9 @@ namespace SimulatorBalancerLibrary
             } catch (Exception e) //computation node error
                             {
                                 //setRepeatComputation(k, j + k * l2, j + k * l2 + l4, ref parameternames, ref parametervalues, ref variablenamesinresult,ref timepoints,ref result);
-                logger.Log(NLog.LogLevel.Error,"computation error:",e);
+              //  logger.Log(NLog.LogLevel.Error,"computation error:",e);
+                                File.AppendAllText("c:\\inetpub\\wwwroot\\identifikace\\logs\\simulatorbalancer.log",
+                                    DateTime.Now + ":" + e.Message + ":" + e.StackTrace);
                                 return null;
                             }
 

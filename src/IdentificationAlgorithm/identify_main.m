@@ -53,13 +53,18 @@ global dirname;
  dlmwrite(strcat(dirname,'variable_names.mat'),variable_names);
  dlmwrite(strcat(dirname,'model_name.mat'),model_name);
  dlmwrite(strcat(dirname,'update_url.mat'),update_url);
- global filename
+ %global filename;
+    global result_ssq
  % set in geaoptimset filename = strcat(dirname,'matlab.log');
  identify_logs('initialized, pwd:',pwd);
+ try
     [p_fitted, val] = identify_minimize( experiment, p_names,p_min,p_max, ...
         p_val, p_is_fixed,variable_names);
-    global result_ssq
-    result_ssq = val;
+ result_ssq = val;
+ catch err
+     identify_logs('identify_main error',getReport(err));
+      result_ssq=0;
+ end
     %add to the end of array the value of ssq - 
             %p_fitted_size = size(p_fitted);
             %p_fitted( p_fitted_size+1) = val;

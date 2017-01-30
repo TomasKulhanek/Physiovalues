@@ -26,7 +26,8 @@ function [xymat] = identify_simulate(p_names,p,variable_names,grid)
 global mySimulator;
 %identify_logs('p_names',p_names(1));
 try
-xymat = mySimulator.Simulate(p_names,p,variable_names,grid);
+    
+    xymat = mySimulator.Simulate(p_names,p,variable_names,grid);
 catch e
     identify_logs('.net simulate exception',getReport(e));
     rethrow(e);
