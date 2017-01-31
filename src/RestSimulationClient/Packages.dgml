@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph GraphDirection="LeftToRight" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="FMUSingleNodeWrapper" Label="FMUSingleNodeWrapper" Category="Project" />
+    <Node Id="Microsoft.Web.Infrastructure 1.0.0.0" Label="Microsoft.Web.Infrastructure 1.0.0.0" Category="Package" />
+    <Node Id="ServiceStack.Host.AspNet 3.9.43" Label="ServiceStack.Host.AspNet 3.9.43" Category="Package" />
+    <Node Id="WebActivator 1.5.3" Label="WebActivator 1.5.3" Category="Package" />
+    <Node Id="DymolaModelInstance" Label="DymolaModelInstance" Category="Project" />
+    <Node Id="NLog 2.0.0.2000" Label="NLog 2.0.0.2000" Category="Package" />
+    <Node Id="RestSharp 103.1" Label="RestSharp 103.1" Category="Package" />
+    <Node Id="ServiceStack.Common 3.9.42" Label="ServiceStack.Common 3.9.42" Category="Package" />
+    <Node Id="ServiceStack.OrmLite.SqlServer 3.9.42" Label="ServiceStack.OrmLite.SqlServer 3.9.42" Category="Package" />
+    <Node Id="ServiceStack.Redis 3.9.42" Label="ServiceStack.Redis 3.9.42" Category="Package" />
+    <Node Id="ServiceStack.Text 3.9.42" Label="ServiceStack.Text 3.9.42" Category="Package" />
+  </Nodes>
+  <Links>
+    <Link Source="ServiceStack.Host.AspNet 3.9.43" Target="WebActivator 1.5.3" Category="Package Dependency" />
+    <Link Source="WebActivator 1.5.3" Target="Microsoft.Web.Infrastructure 1.0.0.0" Category="Package Dependency" />
+    <Link Source="FMUSingleNodeWrapper" Target="Microsoft.Web.Infrastructure 1.0.0.0" Category="Installed Package" />
+    <Link Source="FMUSingleNodeWrapper" Target="ServiceStack.Host.AspNet 3.9.43" Category="Installed Package" />
+    <Link Source="FMUSingleNodeWrapper" Target="WebActivator 1.5.3" Category="Installed Package" />
+    <Link Source="ServiceStack.Common 3.9.42" Target="ServiceStack.Text 3.9.42" Category="Package Dependency" />
+    <Link Source="ServiceStack.OrmLite.SqlServer 3.9.42" Target="ServiceStack.Common 3.9.42" Category="Package Dependency" />
+    <Link Source="ServiceStack.Redis 3.9.42" Target="ServiceStack.Common 3.9.42" Category="Package Dependency" />
+    <Link Source="DymolaModelInstance" Target="NLog 2.0.0.2000" Category="Installed Package" />
+    <Link Source="DymolaModelInstance" Target="RestSharp 103.1" Category="Installed Package" />
+    <Link Source="DymolaModelInstance" Target="ServiceStack.Common 3.9.42" Category="Installed Package" />
+    <Link Source="DymolaModelInstance" Target="ServiceStack.OrmLite.SqlServer 3.9.42" Category="Installed Package" />
+    <Link Source="DymolaModelInstance" Target="ServiceStack.Redis 3.9.42" Category="Installed Package" />
+    <Link Source="DymolaModelInstance" Target="ServiceStack.Text 3.9.42" Category="Installed Package" />
+  </Links>
+  <Categories>
+    <Category Id="Project" />
+    <Category Id="Package" />
+  </Categories>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Project" ValueLabel="True">
+      <Condition Expression="HasCategory('Project')" />
+      <Setter Property="Background" Value="Blue" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Package Dependency" ValueLabel="True">
+      <Condition Expression="HasCategory('Package Dependency')" />
+      <Setter Property="Background" Value="Yellow" />
+    </Style>
+  </Styles>
+</DirectedGraph>
