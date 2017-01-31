@@ -45,7 +45,7 @@ namespace RestMasterService.WebApp
                 uploadedFile.SaveTo(newFilePath);
             }
 
-            return HttpResult.Redirect("/identifikace"); //HttpResult.Status201Created();
+            return ("uploaded"); //HttpResult.Status201Created();
         }
     }
 }

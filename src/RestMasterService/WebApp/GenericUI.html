@@ -73,8 +73,10 @@
                               <option value="mysinc">testovací model</option>
                           </select>
                           <div id="uploadFMU" style="display: none">
+                              <iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
+
                               <p>Upload FMU</p>
-                              <form action="../UploadFMU" method="POST" enctype="multipart/form-data">
+                              <form id="uploadfmuform" action="../UploadFMU" method="POST" enctype="multipart/form-data" target="dummyframe">
                                   <label><b>Upload FMU</b></label>
                                   <div><input type="text" id="url" name="url" placeholder="Enter url to upload via Web" /></div>
                                   <div><input type="file" name="img" id="img" /> <button type="submit">Upload</button></div>
@@ -94,7 +96,6 @@
                               selectedModel = sel.options[sel.selectedIndex].value;
                               console.log(selectedModel);
                           }
-
                       </script>
                       <div id="tabpage_2" class="tabpage">
         
