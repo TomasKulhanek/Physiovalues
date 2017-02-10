@@ -25,9 +25,10 @@ namespace RestMasterService.WebApp
         public FMUFileService()
         {
             targetDir = Environment.GetEnvironmentVariable("PHYSIOVALUES_UPLOAD_DIR");
-            if (targetDir==null) targetDir = "c:\\Users\\tomaton\\Documents\\KOFRLAB-simenv\\Release\\worker8.release\\";
+            if (targetDir == null) targetDir = @"c:\Users\jansilar\worker8.release\";
             if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
         }
+
         public object Post(Upload request)
         {
             if (request.Url != null)
@@ -44,7 +45,6 @@ namespace RestMasterService.WebApp
                 if (!newFilePath.ToLower().EndsWith(".fmu")) throw new FormatException("Only *.FMU files are allowed to upload. Not the '" + uploadedFile.FileName + "'.");
                 uploadedFile.SaveTo(newFilePath);
             }
-
             return ("uploaded"); //HttpResult.Status201Created();
         }
     }
