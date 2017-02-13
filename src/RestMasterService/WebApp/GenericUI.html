@@ -1,8 +1,8 @@
-﻿<!doctype html>
+<!doctype html>
 <html>
 <head>
     <meta charset="utf-8"/>
-    <title>Identifikace: HTML5 preview</title>
+    <title>Identification: HTML5 preview</title>
     <!-- dygraphs, interactive graphs http://dygraphs.com/ --->
     <script type="text/javascript" src="../Scripts/dygraph-combined.js"></script>
     <script type="text/javascript" src="https://ds.eduid.cz/ds.js"></script>    
@@ -36,6 +36,7 @@
         #accountinfo {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
         #loginText2x {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
         #uName {float: right;font-size: 80%;padding-top: 2px;}
+        #lang {float: right;font-size: 80%;padding-top: 2px;}
         #buttons { float: left;}
         #messages { font-size: 80%;}
         #messagewrapper {float: left;font-size:0.5em}
@@ -50,32 +51,33 @@
               <a id="loginText2" href="/Shibboleth.sso/Login" onclick="startOverlay(event)">Login via EDUID.CZ</a><iframe name='myIFrame' id="Iframe2" style='display: none'></iframe>
               <a href='#' onClick="login();" id="loginText"> Login via Google Account </a><a href="#" style="display: none" id="loginText" target='myIFrame' onclick="myIFrame.location = 'https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a><iframe name='myIFrame' id="Iframe1" style='display: none'></iframe>
                 </div>
-              <b id='uName'> Not logged in.&nbsp;</b> 
+              <b id='uName'> Not logged in.&nbsp;</b><br>
+              <b id='lang'><a href="GenericUIcz.html">CZ</a>&nbsp;</b>
               <div id="tabContainer">
                   <div id="tabs">
                       <ul>
-                          <li id="tabHeader_1">Výběr modelu</li>
-                          <li id="tabHeader_2">Experimentální data</li>
-                          <li id="tabHeader_3">Výběr parametrů</li>
-                          <li id="tabHeader_4">Identifikace</li>
-                          <li id="tabHeader_5">Výsledky</li>
+                          <li id="tabHeader_1">Model selection</li>
+                          <li id="tabHeader_2">Sample data</li>
+                          <li id="tabHeader_3">Parameters</li>
+                          <li id="tabHeader_4">Identification</li>
+                          <li id="tabHeader_5">Results</li>
                       </ul>
                   </div>
             
                   <div id="tabscontent">
                       <div id="tabpage_1" class="tabpage">
-                          <h2 class="tabset_label">Výběr modelu</h2>
-                          <p>Tato aplikace slouží k výpočtu neznámých parametrů modelu podle naměřených experimentálních dat. 
-                              Parametry jsou vypočítané tak, aby model který popisuje fungování systému byl co nejvíce ve shodě s naměřenými experimentálními daty.
+                          <h2 class="tabset_label">Model selection</h2>
+                          <p>This application may be used to compute unknown parameters of model based on experimental sample data. The parameters are computed/estimated so the 
+                          model with this parameters will be as much close to the sample experimental data.
                           </p>
-                          <p >Vyberte model, (číslo v závorce počet výpočetních uzlů pro model):</p>
+                          <p >Choose model, (number in parenthesis is number of available computational nodes):</p>
                           <select size="10" name="selectionField" id="models" onchange="getSelectedModel(this)">
-                              <option value="mysinc">testovací model</option>
+                              <option value="mysinc">test model</option>
                           </select>
                           <div id="uploadFMU" style="display: none">
                               <iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
 
-                              <p>Upload FMU</p>
+                              <p>Upload FMU of a new model:</p>
                               <form id="uploadfmuform" action="../UploadFMU" method="POST" enctype="multipart/form-data" target="dummyframe">
                                   <label><b>Upload FMU</b></label>
                                   <div><input type="text" id="url" name="url" placeholder="Enter url to upload via Web" /></div>
@@ -99,9 +101,9 @@
                       </script>
                       <div id="tabpage_2" class="tabpage">
         
-                          <h2 class="tabset_label">Experimentální data</h2>
-                          <p>Do prvního řádku vepište názvy proměnných modelu, do dalších řádku hodnoty, které se podařilo naměřit. První sloupec by měl obsahovat proměnnou čas (Time).
-                              Pro zkopírování hodnot ze souboru pomocí CTRL-C CTRL-V, zajistěte, aby byli hodnoty na řádku odděleny znakem tabulátoru "TAB".</p>
+                          <h2 class="tabset_label">Sample data</h2>
+                          <p>Write names of values into the first row, write values to the other rows. First column should contain time variable (usually Time in models) shown on X axis of the graph.
+                              To copy&amp;paste (CTRL-C CTRL-V) ensure that the values are "TAB" separated, unfortunately comma separated are not yet implemented.</p>
             
                           <div id="dataTable"></div>
                           <div id="graph1"></div>
@@ -172,9 +174,9 @@
 
 
                       <div id="tabpage_3" class="tabpage">
-                          <h2 class="tabset_label">Výběr parametrů</h2>
-                          <p>Vyplňte názvy parametrů a odhadované meze, zaškrtněte ty, které chce identifikovat. Nezaškrtněte ty které budete chtít nastavit na danou hodnotu.
-                              Pro zkopírování hodnot ze souboru pomocí CTRL-C CTRL-V, zajistěte, aby byli hodnoty na řádku odděleny znakem tabulátoru "TAB".</p>
+                          <h2 class="tabset_label">Parameters</h2>
+                          <p>Fill name of parameters, estimated limits, initial values. Check if you want to identify parameters. 
+                                 To copy&amp;paste (CTRL-C CTRL-V) ensure that the values are "TAB" separated, unfortunately comma separated are not yet implemented.</p>
                           <p>
                           </p>
                           <div id="parameterTable"></div>
@@ -214,9 +216,8 @@
 
                       </div>
                       <div id="tabpage_4" class="tabpage">
-                          <h2>Identifikace</h2>
-                      <p>Identifikační algoritmus je časově a výpočetně náročný. Nepřihlášení uživatelé mohou prohlížet výsledky. Přihlášení uživatele 
-                              mohou spustit výpočet. Přihlášení je možné zatím pomocí existujícího účtu Google.</p>
+                          <h2>Identification</h2>
+                      <p>Identification algorithm is time demanding process. Anonymous user may browse results. Logged-in user may run identification. It is possible to log in using  Google account.</p>
                           <div id="identGraph"></div>
                           <div id="computationParamsTable"></div>                          
                       <div id="hidebuttons">
@@ -460,16 +461,16 @@
 
                       </div>
                       <div id="tabpage_5" class="tabpage">
-                          <h2>Výsledky</h2>
-                          <p>Archivní výsledky, identifikované hodnoty parametrů, experimentální a modelová data
+                          <h2>Results</h2>
+                          <p>Archive results, identified values of parameters, model simulation with parameters compared to sample data is shown in graph.
                           </p>
                           <select size="10" name="selectionField" id="selectresult" > 
                               <option>Test</option>
                           </select>
                           <ul id="resultDescription">                              
                           </ul>
-                          <button type="button" id="ResultLoadValues">Načti hodnoty</button>    
-                          Načte hodnoty experimentálních dat a parametrů, které lze editovat v předchozích složkách a spustit příp. opět výpočet.
+                          <button type="button" id="ResultLoadValues">Upload values</button>    
+                          This uploads values to the sample data table and parameters table in previous tabs. This can be reused to repeat the identification computation.
                           <div id="resultTable"></div>
                           
                           <div id="resultGraph"></div>
@@ -604,4 +605,4 @@
          <script type="text/javascript" src="../Scripts/javascript-tabs.js"></script>
 
     </body>
-</html>
+</html>   

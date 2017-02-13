@@ -1,20 +1,21 @@
-﻿<!doctype html>
+<!doctype html>
 <html>
 <head>
     <meta charset="utf-8"/>
     <title>Identifikace: HTML5 preview</title>
     <!-- dygraphs, interactive graphs http://dygraphs.com/ --->
     <script type="text/javascript" src="../Scripts/dygraph-combined.js"></script>
+    <script type="text/javascript" src="https://ds.eduid.cz/ds.js"></script>    
     
     <!-- excel like tables, http://handsontable.com/ -->
-    <script src="../Scripts/jquery-1.9.1.min.js"></script>
+    <script src="../Scripts/jquery-1.12.4.min.js"></script>
     <script src="../Scripts/jquery.handsontable.full.js"></script>
+    <!-- http push technology to notify clients - signalr  http://signalr.net/ -->
+    <script src="../Scripts/jquery.signalR-1.2.2.js" type="text/javascript"></script>
 
     <link rel="stylesheet" media="screen" href="../Scripts/jquery.handsontable.full.css"/>
     <link rel="stylesheet" media="screen" href="../Scripts/javascript-tabs.css"/>
     
-    <!-- http push technology to notify clients - signalr  http://signalr.net/ -->
-    <script src="../Scripts/jquery.signalR-1.1.0.min.js" type="text/javascript"></script>
 <!--  If this is an MVC project then use the following -->
 <!--  <script src="~/signalr/hubs" type="text/javascript"></script> -->
     <script src="../signalr/hubs" type="text/javascript"></script>
@@ -22,53 +23,74 @@
     <script src="../Scripts/mygoogleauth.js"></script>
     <style>
         #graph1 { width:600px; height: 400px; float:left; }
-        #graph1 .dygraph-title { font-size: 30px; text-shadow: 2px 2px 2px gray; }
+        #graph1 .dygraph-title { font-size: 36px; text-shadow: 2px 2px 2px gray; }
         #dataTable { width:400px; height:400px;  float:left; }
         #parameterTable { width:400px; height:200px;  float:left; }
         #identTable { width:400px; height:200px;  float:left; }
         #computationParamsTable { width:400px; height:80px;  float:left; }
         #identGraph { width:600px; height: 400px; float:right; }
-        #identGraph .dygraph-title { font-size: 26px; text-shadow: 2px 2px 2px gray; }
+        #identGraph .dygraph-title { font-size: 36px; text-shadow: 2px 2px 2px gray; }
         #identTimeGraph { width:600px; height: 200px; float:right; }
         #currentRow {background-color: lightblue}
         #currentCol {background-color: lightblue}
-        #loginText {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
+        #accountinfo {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
+        #loginText2x {float: right;font-size: 80% !important;display:inherit;padding-top:2px !important; color:blue;text-decoration:none;text-align:right;}
+        #lang {float: right;font-size: 80%;padding-top: 2px;}
         #uName {float: right;font-size: 80%;padding-top: 2px;}
         #buttons { float: left;}
         #messages { font-size: 80%;}
-        #messagewrapper {float: left;}
+        #messagewrapper {float: left;font-size:0.5em}
         #graphsettingswrapper { float: right;}
         
         select  {  overflow: hidden;background-color: #ffdfdf;color:black;  border:1px solid #000;  padding:5px 3px 5px 10px; }
     </style>
 </head>
     <body>
-              <div id="wrapper">                  
-                 <a href='#' onClick="login();" id="loginText"> Login via Google Account </a><a href="#" style="display:none" id="loginText" target='myIFrame' onclick="myIFrame.location='https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a><iframe name='myIFrame' id="Iframe1" style='display:none'></iframe>
-                 <b id='uName'> Not logged in.&nbsp;</b> 
+              <div id="wrapper">
+                <div id="accountinfo">
+              <a id="loginText2" href="/Shibboleth.sso/Login" onclick="startOverlay(event)">Login via EDUID.CZ</a><iframe name='myIFrame' id="Iframe2" style='display: none'></iframe>
+              <a href='#' onClick="login();" id="loginText"> Login via Google Account </a><a href="#" style="display: none" id="loginText" target='myIFrame' onclick="myIFrame.location = 'https://www.google.com/accounts/Logout'; startLogoutPolling();return false;"> Click here to logout </a><iframe name='myIFrame' id="Iframe1" style='display: none'></iframe>
+                </div>
+              <b id='uName'> Not logged in.&nbsp;</b><br>
+              <b id='lang'><a href="GenericUI.html">EN</a>&nbsp;</b>
               <div id="tabContainer">
                   <div id="tabs">
                       <ul>
-                          <li id="tabHeader_1">Model selection</li>
-                          <li id="tabHeader_2">Sample data</li>
-                          <li id="tabHeader_3">Parameters</li>
-                          <li id="tabHeader_4">Identification</li>
-                          <li id="tabHeader_5">Results</li>
+                          <li id="tabHeader_1">Výběr modelu</li>
+                          <li id="tabHeader_2">Experimentální data</li>
+                          <li id="tabHeader_3">Výběr parametrů</li>
+                          <li id="tabHeader_4">Identifikace</li>
+                          <li id="tabHeader_5">Výsledky</li>
                       </ul>
                   </div>
             
                   <div id="tabscontent">
                       <div id="tabpage_1" class="tabpage">
-                          <h2 class="tabset_label">Model selection</h2>
-                          <p>This application may be used to compute unknown parameters of model based on experimental sample data. The parameters are computed/estimated so the 
-                          model with this parameters will be as much close to the sample experimental data.
+                          <h2 class="tabset_label">Výběr modelu</h2>
+                          <p>Tato aplikace slouží k výpočtu neznámých parametrů modelu podle naměřených experimentálních dat. 
+                              Parametry jsou vypočítané tak, aby model, který popisuje fungování systému, byl co nejvíce ve shodě s naměřenými experimentálními daty.
                           </p>
-                          <p >Choose model, (number in parenthesis is number of available computational nodes):</p>
-                          <select size="10" name="selectionField" id="models" onchange="getSelectedModel(this)"> 
-                              <option value="mysinc" >test model</option>  
+                          <p >Vyberte model, (číslo v závorce počet výpočetních uzlů pro model):</p>
+                          <select size="10" name="selectionField" id="models" onchange="getSelectedModel(this)">
+                              <option value="mysinc">testovací model</option>
                           </select>
+                          <div id="uploadFMU" style="display: none">
+                              <iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
+
+                              <p>Upload FMU</p>
+                              <form id="uploadfmuform" action="../UploadFMU" method="POST" enctype="multipart/form-data" target="dummyframe">
+                                  <label><b>Upload FMU</b></label>
+                                  <div><input type="text" id="url" name="url" placeholder="Enter url to upload via Web" /></div>
+                                  <div><input type="file" name="img" id="img" /> <button type="submit">Upload</button></div>
+                              </form>
+                          </div>
                       </div>
                       <script>
+                          //$.connection.hub.url = "../identifikace6/signalr";
+                          //console.log('setting signalr');
+                          //$.connection.hub.logging = true;
+                          //$.connection.hub.url = '../signalr';
+                          console.log($.connection.hub.url);
                           var selectedModel = '';
                           function getSelectedModel(sel) {
                               console.log("getselectedmodel");
@@ -76,13 +98,12 @@
                               selectedModel = sel.options[sel.selectedIndex].value;
                               console.log(selectedModel);
                           }
-
                       </script>
                       <div id="tabpage_2" class="tabpage">
         
-                          <h2 class="tabset_label">Sample data</h2>
-                          <p>Write names of values into the first row, write values to the other rows. First column should contain time variable (usually Time in models) shown on X axis of the graph.
-                              To copy&amp;paste (CTRL-C CTRL-V) ensure that the values are "TAB" separated, unfortunately comma separated are not yet implemented.</p>
+                          <h2 class="tabset_label">Experimentální data</h2>
+                          <p>Do prvního řádku vepište názvy proměnných modelu, do dalších řádku hodnoty, které se podařilo naměřit. První sloupec by měl obsahovat proměnnou čas (Time).
+                              Pro zkopírování hodnot ze souboru pomocí CTRL-C CTRL-V, zajistěte, aby byli hodnoty na řádku odděleny znakem tabulátoru "TAB".</p>
             
                           <div id="dataTable"></div>
                           <div id="graph1"></div>
@@ -153,9 +174,9 @@
 
 
                       <div id="tabpage_3" class="tabpage">
-                          <h2 class="tabset_label">Parameters</h2>
-                          <p>Fill name of parameters, estimated limits, check if you want to identify parameters, otherwise fill initial value.
-                                 To copy&amp;paste (CTRL-C CTRL-V) ensure that the values are "TAB" separated, unfortunately comma separated are not yet implemented.</p>
+                          <h2 class="tabset_label">Výběr parametrů</h2>
+                          <p>Vyplňte názvy parametrů a odhadované meze, zaškrtněte ty, které chce identifikovat. Nezaškrtněte ty které budete chtít nastavit na danou hodnotu.
+                              Pro zkopírování hodnot ze souboru pomocí CTRL-C CTRL-V, zajistěte, aby byli hodnoty na řádku odděleny znakem tabulátoru "TAB".</p>
                           <p>
                           </p>
                           <div id="parameterTable"></div>
@@ -195,17 +216,21 @@
 
                       </div>
                       <div id="tabpage_4" class="tabpage">
-                          <h2>Identification</h2>
-                          <p>Identification algorithm is time demanding, the computation can be distributed to NGI in Czech Republic (METACENTRUM - CESNET, cloud CERIT-SC) or EGI - grid & cloud for scientific purposes in European level.
-                          </p>
+                          <h2>Identifikace</h2>
+                      <p>Identifikační algoritmus je časově a výpočetně náročný. Nepřihlášení uživatelé mohou prohlížet výsledky. Přihlášení uživatele 
+                              mohou spustit výpočet. Přihlášení je možné zatím pomocí existujícího účtu Google.</p>
                           <div id="identGraph"></div>
                           <div id="computationParamsTable"></div>                          
+                      <div id="hidebuttons">
+                          <button type="button" disabled>Start</button> To start identification, please authenticate.
+                      </div>
                           <div id="buttons">
                               
                               <button type="button" id="startIdentification">Start</button>    
                               <button type="button" id="stopIdentification" display="none">Stop</button>    
                           </div>                         
                           <div id="identTable"></div>
+                          <span id="ssq"></span>
                           <div id="identTimeGraph"></div>
 
                           <div id="messagewrapper">
@@ -215,13 +240,15 @@
                           <p id="graphsettings"><b>Show Series:</b></p>
                               <p id="graphsettings2">
                                   <input type=checkbox id="0" checked onClick="changeVisibility(this)">
-                                      <label for="0"> experiment</label><br/></input>      
+                                      <label for="0"> experiment</label><br/> </input>      
                               </p>
                               </div>
 
                           <script>
+                              $('#buttons').show(); //hide control buttons of identification by default, allowed after auth
+                              $('#hidebuttons').hide();
                               var g3 = new Dygraph(document.getElementById("identGraph"), data2, {
-                                  title:"Experiment sample vs. current estimate",
+                                  title:"data vs. estimate",
                                   drawPoints: true,
                                   labels: glabels,
                                   showRangeSelector: true
@@ -236,7 +263,7 @@
                                   showRangeSelector: false
                               });                              
                               var estimatedParameters = [["a",0.7]];
-                              
+                              //$.connection.hub.url = "../signalr";
                               var fakeidentifystate = $.connection.fakeidentifystate;
                               //change visibility of series in graph
                               function changeVisibility(el) {
@@ -256,6 +283,7 @@
                                   
                                   $('#messages').append('<li> Final result: ' + identifyDTO.Parametervalues+'</li>');
                                   $('#messages').append('<li> Elapsed time: ' + identifyDTO.elapsedtime + '</li>');
+                                  //$('#messages').append('<li> Simulation time: ' + identifyDTO.simulationtime + '</li>');
                                   //remove first <li> if the number of messages is too long.
                                   //console.log("number of li " + $('#messages li').length);
                                   if ($('#messages li').length > 10) $('#messages li:first').remove();
@@ -319,12 +347,13 @@
                                       if (y > 0) {
                                           estimatedTime = ([computationParams[0] * computationParams[1]] - identifyDTO.countcycles) / y;
                                           fulltime = ([computationParams[0] * computationParams[1]]) / y;
-                                          $('#messages').append('<li>'+ identifyDTO.countcycles + ' simulací. Čas do konce ' + estimatedTime + 's. Čas výpočtu '+fulltime + 's</li>');
+                                          $('#messages').append('<li>' + identifyDTO.countcycles + ' simulací.  simulation:' +identifyDTO.elapsedtime+ ' ms. simulace:' + identifyDTO.simulationtime + ' ms. Čas do konce ' + estimatedTime + 's. Čas výpočtu ' + fulltime + 's</li>');
                                       }
                                   }
                                   //public long countpercycle { get; set; }public int workerspercycle)
                                   //remove first <li> if the number of messages is too long.
                                   //console.log("number of li " + $('#messages li').length);
+                                  $('#ssq').text('estimated ssq: ' + identifyDTO.Ssq);
                                   if ($('#messages li').length > 10) $('#messages li:first').remove();
                                   //TODO variablebalues in graph
 
@@ -433,16 +462,16 @@
 
                       </div>
                       <div id="tabpage_5" class="tabpage">
-                          <h2>Results</h2>
-                          <p>Archive results, identified values of parameters, model simulation with parameters compared to sample data is shown in graph.
+                          <h2>Výsledky</h2>
+                          <p>Archivní výsledky, identifikované hodnoty parametrů, experimentální a modelová data
                           </p>
                           <select size="10" name="selectionField" id="selectresult" > 
                               <option>Test</option>
                           </select>
                           <ul id="resultDescription">                              
                           </ul>
-                          <button type="button" id="ResultLoadValues">Upload values</button>    
-                          This uploads values to the sample data table and parameters table in previous tabs. This can be reused to repeat the identification computation.
+                          <button type="button" id="ResultLoadValues">Načti hodnoty</button>    
+                          Načte hodnoty experimentálních dat a parametrů, které lze editovat v předchozích složkách a spustit příp. opět výpočet.
                           <div id="resultTable"></div>
                           
                           <div id="resultGraph"></div>
@@ -455,9 +484,9 @@
                                   var length = results.length;
 
                                   for (var i = 0; i < length; i++) {
-                                      console.log("id " + results[i].Id + " name " + results[i].Name);
+                                      console.log("id " + results[i].Id + " name " + results[i].name);
 
-                                      selectionText += "<option value='" + results[i].Id + "' onclick='changeResultView(this)'>" + results[i].Name + "</option>";
+                                      selectionText += "<option value='" + results[i].Id + "' onclick='changeResultView(this)'>" + results[i].name + "</option>";
                                   }
                                   console.log(selectionText);
                                   $('#selectresult').html(selectionText);
@@ -522,6 +551,7 @@
                                       $('#resultDescription').append('<li> ssq:' + identifyDTO.ssq + '</li>');
                                       $('#resultDescription').append('<li> computation cycles:' + identifyDTO.countcycles + '</li>');
                                       $('#resultDescription').append('<li> computation time:' + identifyDTO.elapsedtime + '</li>');
+                                      $('#resultDescription').append('<li> simulation time:' + identifyDTO.simulationtime + '</li>');
                                   });
                                   //update resultTable
                                   //update resultGraph
@@ -576,4 +606,4 @@
          <script type="text/javascript" src="../Scripts/javascript-tabs.js"></script>
 
     </body>
-</html>
+</html>   
