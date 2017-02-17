@@ -101,9 +101,12 @@ namespace FMUSingleNodeWrapper
         private static void OnChanged(object source, FileSystemEventArgs e)
         {
             //no action, when the change is a new directory with *.fmu - created by driver
-            if ((e!=null) && Directory.Exists(e.FullPath)) return;
 
-            Console.WriteLine("change in directory detected or restart triggered on "+e.FullPath);
+            if (e != null)
+            {
+                if (Directory.Exists(e.FullPath)) return;
+                Console.WriteLine("change in directory detected or restart triggered on " + e.FullPath);
+            }
             unregisterRestWorker();
             NodeServerParams.FMUFiles.Clear();
             MyUtils.tryFindFile(typeof(NodeServerParams), "*.fmu", "ParamF");
