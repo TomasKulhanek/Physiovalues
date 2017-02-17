@@ -232,12 +232,12 @@ namespace FMUSingleNodeWrapper
                     double step = simulationsteps > 0 ? (stopTime - startTime)/(double) simulationsteps : 0;
                     //first set parameters ??
                     //now set the parameter
-                    SetSimulationParameters(parameterNames, parameterValues);
+                    //SetSimulationParameters(parameterNames, parameterValues);
                     //reset time resets the simulator??
                     double st = startTime;
                     double sp = stopTime;
                     ResetSimulationTimes(st, step, sp); //TODO bug when calling the simulation second time
-
+                    SetSimulationParameters(parameterNames, parameterValues);
                     //and initialize, after initialization it is not possible to change some other parameters
                     //InitializeSlave(); //fixed bug not set parameters after init
                     SameStepSimulate(ref myresults, varnames);
@@ -261,10 +261,10 @@ namespace FMUSingleNodeWrapper
             double stopTime = timePoints[timePoints.Length - 1]; //last point
             //set simulation times, but the simulation step will be changed during the simulation
             //bug #163  first set parameters ??
-            SetSimulationParameters(parameterNames, parameterValues);
+//            SetSimulationParameters(parameterNames, parameterValues);
 
             ResetSimulationTimes(startTime, (stopTime - startTime) / timePoints.Length, stopTime);
-            
+            SetSimulationParameters(parameterNames, parameterValues);
 
             //SetSimulationParameters(parameterNames, parameterValues);
             //InitializeSlave(); //fixed bug not set parameters after init

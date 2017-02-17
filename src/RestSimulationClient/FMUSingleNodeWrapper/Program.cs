@@ -35,9 +35,9 @@ namespace FMUSingleNodeWrapper
 
         private static void stopHttpServer()
         {
-            degisterRESTWorker();
+            unregisterRestWorker();
             appHost.Stop();
-            //degisterRESTWorker();
+            //unregisterRestWorker();
         }
 
         private static void runHttpServer()
@@ -54,13 +54,13 @@ namespace FMUSingleNodeWrapper
 
         static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            degisterRESTWorker();
+            unregisterRestWorker();
             //throw new NotImplementedException();
         }
 
         static void CurrentDomain_DomainUnload(object sender, EventArgs e)
         {
-            degisterRESTWorker();
+            unregisterRestWorker();
             //throw new NotImplementedException();
         }
 
@@ -72,10 +72,10 @@ namespace FMUSingleNodeWrapper
             watch();
             while (true) 
             {
-                Thread.Sleep(60*60*1000); //sleep for 60 minutes
-                if (NodeServerParams.sw.ElapsedMilliseconds > (50 * 60 * 1000)) //last work was done 50 minutes ago
+                Thread.Sleep(50*60*1000); //sleep for 50 minutes
+                if (NodeServerParams.sw.ElapsedMilliseconds > (40 * 60 * 1000)) //last work was done 4 minutes ago
                 { 
-                    registerEachFMU(); 
+                    OnChanged(null,null);
                 }
                 NodeServerParams.sw.Restart(); //reset the timer
             }            
@@ -85,17 +85,27 @@ namespace FMUSingleNodeWrapper
         {
             FileSystemWatcher watcher = new FileSystemWatcher();
             watcher.Path = ".";
-            watcher.NotifyFilter = NotifyFilters.LastWrite;
+            watcher.NotifyFilter = NotifyFilters.LastWrite
+                                   | NotifyFilters.FileName;
             watcher.Filter = "*.fmu";
+
             watcher.Changed += new FileSystemEventHandler(OnChanged);
+            watcher.Deleted += new FileSystemEventHandler(OnChanged);
             watcher.Created += new FileSystemEventHandler(OnChanged);
+            watcher.Renamed += new RenamedEventHandler(OnChanged);
+
+
             watcher.EnableRaisingEvents = true;
         }
 
         private static void OnChanged(object source, FileSystemEventArgs e)
         {
-            Console.WriteLine("change in directory detected");
-            degisterRESTWorker();
+            //no action, when the change is a new directory with *.fmu - created by driver
+            if ((e!=null) && Directory.Exists(e.FullPath)) return;
+
+            Console.WriteLine("change in directory detected or restart triggered on "+e.FullPath);
+            unregisterRestWorker();
+            NodeServerParams.FMUFiles.Clear();
             MyUtils.tryFindFile(typeof(NodeServerParams), "*.fmu", "ParamF");
             registerEachFMU();
         }
@@ -174,14 +184,20 @@ namespace FMUSingleNodeWrapper
             }
         }
 
-        private static void degisterRESTWorker()
+        private static void unregisterRestWorker()
         {
             try
             {
                 var client = new JsonServiceClient(NodeServerParams.MasterServiceWorkerURL);
-                List<Worker> response = client.Delete(new Workers(NodeServerParams.Id.Values.ToArray()));
+                var workerids = NodeServerParams.Id.Values;
+                foreach (var workerid in workerids)
+                {
+                    var response = client.Delete(new Workers(workerid));
+                    Console.WriteLine(Resources.Program_degisterRESTWorker_Deregistered_worker_id__0__on__1_, workerid, NodeServerParams.MasterServiceWorkerURL);
+                    Thread.Sleep(500);
+                }
+                //List<Worker> response = client.Delete(new Workers(NodeServerParams.Id.Values.ToArray()));
                 //NodeServerParams.Id = response.;
-                Console.WriteLine(Resources.Program_degisterRESTWorker_Deregistered_worker_id__0__on__1_, NodeServerParams.Id,NodeServerParams.MasterServiceWorkerURL);
             }
             catch (Exception e)
             {

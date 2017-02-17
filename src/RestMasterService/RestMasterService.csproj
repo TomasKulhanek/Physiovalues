@@ -155,6 +155,7 @@
     <Content Include="Scripts\jquery-1.12.4.js" />
     <Content Include="Scripts\jquery-1.12.4.min.js" />
     <Content Include="Scripts\jquery-1.12.4.min.map" />
+    <Content Include="WebApp\GenericUIcz.html" />
     <Content Include="WebApp\GraphicElements.htm" />
     <None Include="Properties\PublishProfiles\identifikace7.pubxml" />
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
@@ -165,7 +166,6 @@
     <Content Include="Scripts\jquery.signalR-1.2.2.min.js" />
     <Content Include="Scripts\mygoogleauth.js" />
     <Content Include="WebApp\GenericUI.html" />
-    <Content Include="WebApp\GenericUIen.html" />
     <Content Include="WebApp\FakeIdentify.html" />
     <Content Include="Scripts\addclasskillclass.js" />
     <Content Include="Scripts\AddCSS.js" />

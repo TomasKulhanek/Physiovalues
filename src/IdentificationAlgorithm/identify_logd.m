@@ -1,5 +1,9 @@
 function identify_logd(title,messaged)
 %filename = 'c:\Users\tomaton\Documents\KOFRLAB-simenv\VersionedProjects\matlab.log';
+global debuglog;
+if not(debuglog)
+    return;
+end
 global filename;
 fid=fopen(filename,'a');
 [rows,collumns] = size(messaged);

@@ -25,7 +25,7 @@ namespace RestMasterService.WebApp
         public FMUFileService()
         {
             targetDir = Environment.GetEnvironmentVariable("PHYSIOVALUES_UPLOAD_DIR");
-            if (targetDir == null) targetDir = @"c:\Users\jansilar\worker8.release\";
+            if (targetDir == null) targetDir = @"c:\opt\worker8.release\";
             if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
         }
 
