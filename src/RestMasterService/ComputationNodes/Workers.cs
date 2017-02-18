@@ -129,9 +129,8 @@ namespace RestMasterService.ComputationNodes
         
         public Worker Store(Worker worker)
         {
-            lock (_workerLock)
-            {
-                var existing = workers.FirstOrDefault(x => x.Id == worker.Id);
+
+                var existing = workers.FirstOrDefault(x => (x.ModelName == worker.ModelName) && (x.RestUrl==worker.RestUrl));
                 if (existing == null)
                 {
                     var newId = workers.Count > 0 ? workers.Max(x => x.Id) + 1 : 1;
@@ -140,9 +139,10 @@ namespace RestMasterService.ComputationNodes
                 }
                 else
                 {
+                    worker.Id = existing.Id;
                     existing.PopulateWith(worker);
                 }
-            }
+            
             return worker;
         }
 
