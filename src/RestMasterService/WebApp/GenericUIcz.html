@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html>
 <head>
     <meta charset="utf-8"/>
@@ -381,6 +381,26 @@
                                   fakeidentifystate.client.updateModels(models);
                                   fakeidentifystate.client.updateResults(results);
                               };
+                              
+                              var modelsurl= "../workers";
+                              
+                              jQuery.getJSON(modelsurl, function (modelsDTO) {
+                                  var selectionText = "";
+                                  var models=[];
+                                  for (var i=0;i<modelsDTO.length;i++) {
+                                     if (models[modelsDTO[i].modelName]) models[modelsDTO[i].modelName]++;
+                                     else models[modelsDTO[i].modelName] = 1;
+                                  }
+                                  var length = models.length;
+
+                                  for (var model in models) {
+                                      selectionText += "<option value='" + model + "'>" + model+ " ("+models[model]+")</option>";
+                                  }
+                                  console.log(selectionText);
+                                  $('#models').html(selectionText);
+                              });
+                              
+
 
                               fakeidentifystate.client.updateModels = function (models) {
                                   console.log("update models");
@@ -475,6 +495,19 @@
                           
                           <div id="resultGraph"></div>
                           <script>
+                              var resultsurl2= "../results";
+                              
+                              jQuery.getJSON(resultsurl2, function (results) {
+                                  var selectionText = "";
+                                  var length = results.length;
+                                  for (var i = 0; i < length; i++) {
+                                      //console.log("id " + results[i].id + " name " + results[i].name);
+
+                                      selectionText += "<option value='" + results[i].id + "' onclick='changeResultView(this)'>" + results[i].name + "</option>";
+                                  }
+                                  console.log(selectionText);
+                                  $('#selectresult').html(selectionText);
+                              });
 
                               fakeidentifystate.client.updateResults = function (results) {
                                   console.log("update results");
