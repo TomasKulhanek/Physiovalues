@@ -3,10 +3,10 @@
 Project of web application to compute, store and provide values of parameters of physiological models via lightweight API.
 
 ### Project Parts
-* [app.physiovalues.org](http://app.physiovalues.org) - Special application for parameter estimation of selected models. 
-* [sim.physiovalues.org](http://sim.physiovalues.org) - Web-based simulators and simulator editor of selected models.
+* [app.physiovalues.tk](http://app.physiovalues.tk) - Special application for parameter estimation of selected models. 
+* [sim.physiovalues.tk](http://sim.physiovalues.tk) - Web-based simulators and simulator editor of selected models.
 * [physiome@home](http://physiome.lf1.cuni.cz/ident3) - BOINC Application for parameter sweep.
-* [book.physiovalues.org](http://book.physiovalues.org) - New book about modeling medical physiology
+* [book.physiovalues.org](http://book.physiovalues.tk) - New book about modeling medical physiology
 
 ### Code base
 
@@ -27,5 +27,5 @@ Project of web application to compute, store and provide values of parameters of
 ### Developers and Contributor
 * [Tomáš Kulhánek](https://github.com/TomasKulhanek)
 * [Marek Mateják](https://github.com/MarekMatejak)
-
-
+* [Filip Ježek](https://filip-jezek.github.io/)
+* [Jan Šilar](https://github.com/jansilar)
