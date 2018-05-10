@@ -6,7 +6,7 @@ Project of web application to compute, store and provide values of parameters of
 * [app.physiovalues.tk](http://app.physiovalues.tk) - Special application for parameter estimation of selected models. 
 * [sim.physiovalues.tk](http://sim.physiovalues.tk) - Web-based simulators and simulator editor of selected models.
 * [physiome@home](http://physiome.lf1.cuni.cz/ident3) - BOINC Application for parameter sweep.
-* [book.physiovalues.org](http://book.physiovalues.tk) - New book about modeling medical physiology
+* [book.physiovalues.tk](http://book.physiovalues.tk) - New book about modeling medical physiology
 
 ### Code base
 
