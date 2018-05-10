@@ -2,7 +2,7 @@ title: Physiovalues
 description: Project of web application to compute, store and provide values of parameters of physiological models.
 google_analytics: "UA-49498629-1 "
 show_downloads: true
-theme: jekyll-theme-time-machine
+theme: jekyll-theme-architect
 
 gems:
   - jekyll-mentions
